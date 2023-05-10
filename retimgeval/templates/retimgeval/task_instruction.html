@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ task.name }}{% endblock title %}
+
+{% block content %}
+
+{% if task.pk == 1 %}
+<h1>Task 1 Instruction</h1>
+<p>Placeholder for task 1 instructions.</p>
+{% endif %}
+
+{% if task.pk == 2 %}
+<h1>Task 2 Condition 1 Instruction</h1>
+
+<p>Placeholder for task 2 condition 1 instructions.</p>
+{% endif %}
+
+{% if task.pk == 3 %}
+<h1>Task 2 Condition 2 Instruction</h1>
+<p>Placeholder for task 2 condition 2 instructions.</p>
+{% endif %}
+
+<button id="start-btn">Start Task</button>
+
+<script>
+    document.getElementById("start-btn").addEventListener("click", function() {
+        window.location.href = "{{ task.get_absolute_url }}";
+    });
+</script>
+
+{% endblock content %}

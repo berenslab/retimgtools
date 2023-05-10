@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Evaluation Landing Page{% endblock title %}
+
+{% block content %}
+<h1>Welcome to the Evaluation Task</h1>
+<p>Placeholder for the description of the task...</p>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Start Evaluation</button>
+</form>
+{% endblock content %}

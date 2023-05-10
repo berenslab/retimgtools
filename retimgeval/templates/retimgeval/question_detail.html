@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ question.description }}{% endblock title %}
+{% block content %}
+<h1>{{ question.description }}</h1>
+
+<table>
+    {% if question.task.id == 1%}
+    <tr>
+        {% if question.image1 %}<th>a</th>{% endif %}
+        {% if question.image2 %}<th>b</th>{% endif %}
+        {% if question.image3 %}<th>c</th>{% endif %}
+    </tr>
+
+    {% else %}
+
+        {% if question.image2 %}
+            <tr>
+                {% if question.image1 %}<th>Better</th>{% endif %}
+                {% if question.image2 %}<th>Original</th>{% endif %}
+                {% if question.image3 %}<th>Worse</th>{% endif %}
+            </tr>
+        {% else %}
+        <tr>
+            <th>Original</th>
+        </tr>            
+        
+        {% endif %}
+
+    {% endif %}
+
+    <tr>
+        {% if question.image1 %}
+        <td>
+            <canvas class="imageCanvas" width="450" height="450" data-src="{{ question.image1.url }}"></canvas>
+            <canvas class="magnifierCanvas" width="150" height="150" style="{% if question.task.id == 1 %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+        </td>
+        {% endif %}
+        {% if question.image2 %}
+            <td>
+                <canvas class="imageCanvas" width="450" height="450" data-src="{{ question.image2.url }}"></canvas>
+                <canvas class="magnifierCanvas" width="150" height="150" style="{% if question.task.id == 1 %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+            </td>
+        {% endif %}
+        {% if question.image3 %}
+            <td>
+                <canvas class="imageCanvas" width="450" height="450" data-src="{{ question.image3.url }}"></canvas>
+                <canvas class="magnifierCanvas" width="150" height="150" style="{% if question.task.id == 1 %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+            </td>
+        {% endif %}
+    </tr>
+</table>
+
+{% include "retimgeval/answer_form.html" %}
+
+{% if question.task.id == 1%}
+<script type="text/javascript">
+    setTimeout(function() {
+        var canvases = document.getElementsByTagName('canvas');
+        for (var i = 0; i < canvases.length; i++) {
+            var ctx = canvases[i].getContext('2d');
+            ctx.clearRect(0, 0, canvases[i].width, canvases[i].height);
+
+            canvases[i].style.border = '2px solid black';
+        }
+    }, 5000);
+</script>
+
+{% endif %}
+
+<script>
+
+    const imageCanvases = document.querySelectorAll('.imageCanvas');
+    const magnifierCanvases = document.querySelectorAll('.magnifierCanvas');
+    const magnifierSize = 150;
+    const zoomLevel = 2;
+
+    for (let i = 0; i < imageCanvases.length; i++) {
+        const imageCanvas = imageCanvases[i];
+        const magnifierCanvas = magnifierCanvases[i];
+        const imageCtx = imageCanvas.getContext('2d');
+        const magnifierCtx = magnifierCanvas.getContext('2d');
+
+        // Ensure the image fills the canvas
+        const img = new Image();
+        img.onload = function() {
+            imageCtx.drawImage(img, 0, 0, imageCanvas.width, imageCanvas.height);
+
+            // Only attach the event listeners if the task id is not 1
+            {% if question.task.id != 1 %}
+            // Implement the magnifier effect
+            imageCanvas.addEventListener('mousemove', function(event) {
+                const rect = imageCanvas.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+
+                // Clear the magnifier canvas
+                magnifierCtx.clearRect(0, 0, magnifierCanvas.width, magnifierCanvas.height);
+
+                // Draw the magnified portion of the image
+                magnifierCtx.drawImage(
+                    imageCanvas, 
+                    Math.max(0, x - magnifierSize / (2 * zoomLevel)), 
+                    Math.max(0, y - magnifierSize / (2 * zoomLevel)), 
+                    Math.min(magnifierSize / zoomLevel, imageCanvas.width - x + magnifierSize / (2 * zoomLevel)), 
+                    Math.min(magnifierSize / zoomLevel, imageCanvas.height - y + magnifierSize / (2 * zoomLevel)), 
+                    0, 
+                    0, 
+                    Math.min(magnifierSize, magnifierSize * (imageCanvas.width - x + magnifierSize / (2 * zoomLevel)) / (magnifierSize / zoomLevel)), 
+                    Math.min(magnifierSize, magnifierSize * (imageCanvas.height - y + magnifierSize / (2 * zoomLevel)) / (magnifierSize / zoomLevel))
+                );
+
+                // Draw a circle at the center of the magnifier
+                magnifierCtx.beginPath();
+                magnifierCtx.arc(magnifierSize / 2, magnifierSize / 2, 5, 0, 2 * Math.PI);
+                magnifierCtx.strokeStyle = 'black';
+                magnifierCtx.lineWidth = 2;
+                magnifierCtx.stroke();
+            });
+
+            // Hide the magnifier when the mouse leaves the image
+            imageCanvas.addEventListener('mouseleave', function() {
+                magnifierCtx.clearRect(0, 0, magnifierCanvas.width, magnifierCanvas.height);
+            });
+            {% endif %}
+        };
+        img.src = imageCanvas.getAttribute('data-src');
+    }
+</script>
+
+
+
+{% endblock content %}

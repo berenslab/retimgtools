@@ -1,0 +1,22 @@
+<h2>Answer</h2>
+<form action="{{ question.get_absolute_url}}" method="POST">
+  {{ form.as_p }} {% csrf_token %}
+  <p><input type="submit" value="submit" /></p>
+</form>
+
+{% comment %} javascript code to record the time spent on filling out the form
+save it to the variable "reaction_time" and send it to the django model Answer()
+when submitting the form with POST {% endcomment %}
+<script>
+  {% comment %} reaction time {% endcomment %}
+  var form = document.getElementsByTagName("form")[0];
+  form.addEventListener("submit", function(event) {
+      var reaction_time = new Date().getTime() - start;
+      var input = document.createElement("input");
+      input.setAttribute("type", "hidden");
+      input.setAttribute("name", "reaction_time");
+      input.setAttribute("value", reaction_time);
+      form.appendChild(input);
+  });
+  var start = new Date().getTime();
+</script>

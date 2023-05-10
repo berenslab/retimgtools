@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}User: {{ object.username }}{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="row">
+    <div class="col-sm-12">
+
+      {% if object.name %}
+        <h2>{{ object.name }}</h2>
+      {% endif %}
+      <p>@{{ object.username }}</p>
+
+      {% if object.experience %}
+        <p>Year of Experience: {{ object.experience | linebreaksbr }} year(s)</p>
+      {% endif %}
+    </div>
+  </div>
+
+{% if object == request.user %}
+<!-- Action buttons -->
+<div class="row">
+
+  <div class="col-sm-12">
+    <a class="btn btn-primary" href="{% url 'accounts:update' %}" role="button">Update Info</a>
+    <a class="btn btn-primary" href="{% url 'password_change' %}" role="button">Change Password</a>
+    <!-- Your Stuff: Custom user template urls -->
+  </div>
+
+</div>
+<!-- End Action buttons -->
+{% endif %}
+
+
+</div>
+{% endblock content %}
+

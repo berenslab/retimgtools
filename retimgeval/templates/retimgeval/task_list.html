@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>All Tasks</h1>
+{% if user.is_authenticated %}
+{% for task in tasks %}
+<h2>
+    <a href="{% url 'retimgeval:task_instruction' task.pk %}">{{ task.description }}</a>
+</h2>
+{% endfor %}
+{% else %}
+    <p>You are not logged in</p>
+{% endif %} 
+
+{% comment %} {% if user.is_authenticated %}
+{% for task in tasks %}
+<ul>
+    {% for task in task_list %}
+        <li><a href="{% url 'retimgeval:task-instruction' task.pk %}">{{ task.description }}</a></li>
+    {% endfor %}
+</ul>
+{% endfor %}
+{% else %}
+    <p>You are not logged in</p>
+{% endif %} {% endcomment %}
+{% endblock content %}

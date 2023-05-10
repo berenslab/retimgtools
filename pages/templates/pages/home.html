@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+    {% if user.is_authenticated %}
+
+        <h1>Homepage</h1>
+        <div class="list-group">
+            <a href="/annotate" class="list-group-item list-group-item-action">Annotation</a>
+            <a href="/evaluate" class="list-group-item list-group-item-action">Evaluation</a>
+        </div>
+
+    {% else %}
+
+        <p>You are not logged in yet.</p>
+        
+    {% endif %}
+
+{% endblock %}

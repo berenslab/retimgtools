@@ -1,0 +1,10 @@
+.retimgtools
+.DS_Store
+.env
+media/*
+populate.py
+db.sqlite3
+
+*/__pycache__/*
+*/migrations/*
+!*/migrations/__init__.py
