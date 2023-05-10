@@ -2,7 +2,6 @@
 .DS_Store
 .env
 
-populate.py
 db.sqlite3
 
 */__pycache__/*
