@@ -69,64 +69,74 @@
 {% endif %}
 
 <script>
-
     const imageCanvases = document.querySelectorAll('.imageCanvas');
     const magnifierCanvases = document.querySelectorAll('.magnifierCanvas');
     const magnifierSize = 150;
     const zoomLevel = 2;
 
+    const clearMagnifiers = () => {
+        magnifierCanvases.forEach(magnifierCanvas => {
+            const magnifierCtx = magnifierCanvas.getContext('2d');
+            magnifierCtx.clearRect(0, 0, magnifierCanvas.width, magnifierCanvas.height);
+        });
+    };
+
+    const updateMagnifiers = (x, y, imageCanvas) => {
+        imageCanvases.forEach((imageCanvas, index) => {
+            const magnifierCtx = magnifierCanvases[index].getContext('2d');
+            magnifierCtx.clearRect(0, 0, magnifierCanvases[index].width, magnifierCanvases[index].height);
+            magnifierCtx.drawImage(
+                imageCanvas,
+                Math.max(0, x - magnifierSize / (2 * zoomLevel)), 
+                Math.max(0, y - magnifierSize / (2 * zoomLevel)), 
+                Math.min(magnifierSize / zoomLevel, imageCanvas.width - x + magnifierSize / (2 * zoomLevel)), 
+                Math.min(magnifierSize / zoomLevel, imageCanvas.height - y + magnifierSize / (2 * zoomLevel)), 
+                0, 
+                0, 
+                Math.min(magnifierSize, magnifierSize * (imageCanvas.width - x + magnifierSize / (2 * zoomLevel)) / (magnifierSize / zoomLevel)), 
+                Math.min(magnifierSize, magnifierSize * (imageCanvas.height - y + magnifierSize / (2 * zoomLevel)) / (magnifierSize / zoomLevel))
+            );
+            magnifierCtx.beginPath();
+            magnifierCtx.arc(magnifierSize / 2, magnifierSize / 2, 5, 0, 2 * Math.PI);
+            magnifierCtx.strokeStyle = 'black';
+            magnifierCtx.lineWidth = 2;
+            magnifierCtx.stroke();
+        });
+    };
+
     for (let i = 0; i < imageCanvases.length; i++) {
         const imageCanvas = imageCanvases[i];
-        const magnifierCanvas = magnifierCanvases[i];
         const imageCtx = imageCanvas.getContext('2d');
-        const magnifierCtx = magnifierCanvas.getContext('2d');
-
-        // Ensure the image fills the canvas
         const img = new Image();
+
         img.onload = function() {
             imageCtx.drawImage(img, 0, 0, imageCanvas.width, imageCanvas.height);
 
-            // Only attach the event listeners if the task id is not 1
             {% if question.task.id != 1 %}
-            // Implement the magnifier effect
+            imageCanvas.addEventListener('mouseenter', function(event) {
+                const rect = imageCanvas.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+                updateMagnifiers(x, y, imageCanvas);
+            });
+
             imageCanvas.addEventListener('mousemove', function(event) {
                 const rect = imageCanvas.getBoundingClientRect();
                 const x = event.clientX - rect.left;
                 const y = event.clientY - rect.top;
-
-                // Clear the magnifier canvas
-                magnifierCtx.clearRect(0, 0, magnifierCanvas.width, magnifierCanvas.height);
-
-                // Draw the magnified portion of the image
-                magnifierCtx.drawImage(
-                    imageCanvas, 
-                    Math.max(0, x - magnifierSize / (2 * zoomLevel)), 
-                    Math.max(0, y - magnifierSize / (2 * zoomLevel)), 
-                    Math.min(magnifierSize / zoomLevel, imageCanvas.width - x + magnifierSize / (2 * zoomLevel)), 
-                    Math.min(magnifierSize / zoomLevel, imageCanvas.height - y + magnifierSize / (2 * zoomLevel)), 
-                    0, 
-                    0, 
-                    Math.min(magnifierSize, magnifierSize * (imageCanvas.width - x + magnifierSize / (2 * zoomLevel)) / (magnifierSize / zoomLevel)), 
-                    Math.min(magnifierSize, magnifierSize * (imageCanvas.height - y + magnifierSize / (2 * zoomLevel)) / (magnifierSize / zoomLevel))
-                );
-
-                // Draw a circle at the center of the magnifier
-                magnifierCtx.beginPath();
-                magnifierCtx.arc(magnifierSize / 2, magnifierSize / 2, 5, 0, 2 * Math.PI);
-                magnifierCtx.strokeStyle = 'black';
-                magnifierCtx.lineWidth = 2;
-                magnifierCtx.stroke();
+                updateMagnifiers(x, y, imageCanvas);
             });
 
-            // Hide the magnifier when the mouse leaves the image
             imageCanvas.addEventListener('mouseleave', function() {
-                magnifierCtx.clearRect(0, 0, magnifierCanvas.width, magnifierCanvas.height);
+                clearMagnifiers();
             });
             {% endif %}
         };
+
         img.src = imageCanvas.getAttribute('data-src');
     }
 </script>
+
 
 
 
