@@ -1,3 +1,4 @@
+from csvexport.actions import csvexport
 from django.contrib import admin
 
 from .models import Annotation, Consent, Image
@@ -16,3 +17,6 @@ class ImageAdmin(admin.ModelAdmin):
 @admin.register(Annotation)
 class AnnotationAdmin(admin.ModelAdmin):
     list_display = ["user", "image", "coordinates"]
+    list_filter = ("user", "image")
+
+    actions = [csvexport]

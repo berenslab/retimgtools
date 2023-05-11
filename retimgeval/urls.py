@@ -18,4 +18,4 @@ urlpatterns = [
         views.question_detail,
         name="question_detail",
     ),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]

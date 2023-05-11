@@ -61,7 +61,7 @@ t2 = Task(description="Task 2 - condtion 1")
 t2.save()
 
 all_image_t2c1 = sorted(glob.glob("media/evaluate/Task2/cond1/*.png"))
-num_img_set_t2c1 = len(set([img[:-5] for img in all_image_t2c1])) + 1
+num_img_set_t2c1 = len(set([img[:-4] for img in all_image_t2c1])) + 1
 for img in range(1, num_img_set_t2c1):
     q1 = t2.question_set.create(
         description=f"[Task 2/1] Q{img}.1: Diabetic Retinopathy referral",
