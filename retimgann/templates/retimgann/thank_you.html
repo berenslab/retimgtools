@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+{% if user.is_authenticated %}
 <h1>Thank you for your annotations!</h1>
 <p>Your contribution to our project is highly appreciated.</p>
+
+{% else %}
+    <p>You are not logged in yet.</p>
+{% endif %}
+
 {% endblock %}

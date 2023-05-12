@@ -2,6 +2,10 @@
 
 {% block title %}{{ question.description }}{% endblock title %}
 {% block content %}
+
+{% if user.is_authenticated %}
+
+
 <h1>{{ question.description }}</h1>
 
 <table>
@@ -138,6 +142,10 @@
 </script>
 
 
+{% else %}
 
+<p>You are not logged in yet.</p>
+
+{% endif %}
 
 {% endblock content %}

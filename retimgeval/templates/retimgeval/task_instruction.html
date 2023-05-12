@@ -4,6 +4,8 @@
 
 {% block content %}
 
+{% if user.is_authenticated %}
+
 {% if task.pk == 1 %}
 <h1>Task 1 Instruction</h1>
 <p>Placeholder for task 1 instructions.</p>
@@ -27,5 +29,11 @@
         window.location.href = "{{ task.get_absolute_url }}";
     });
 </script>
+
+{% else %}
+
+<p>You are not logged in yet.</p>
+
+{% endif %}
 
 {% endblock content %}

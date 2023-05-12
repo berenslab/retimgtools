@@ -3,6 +3,9 @@
 {% block title %}Annotate{% endblock %}
 
 {% block content %}
+
+{% if user.is_authenticated %}
+
 <h1>Annotate Image</h1>
 
 <div class="row">
@@ -240,6 +243,13 @@
     }
 </script>
 
+
+
+{% else %}
+
+<p>You are not logged in yet.</p>
+
+{% endif %}
 
 {% endblock %}
 

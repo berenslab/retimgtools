@@ -3,6 +3,9 @@
 {% block title %}Annotation Landing Page{% endblock title %}
 
 {% block content %}
+
+{% if user.is_authenticated %}
+
 <h1>Welcome to the Annotation Task</h1>
 <p>Placeholder for the description of the task...</p>
 
@@ -11,4 +14,11 @@
     {{ form.as_p }}
     <button type="submit" class="btn btn-primary">Start Annotation</button>
 </form>
+
+{% else %}
+
+<p>You are not logged in yet.</p>
+
+{% endif %}
+
 {% endblock content %}
