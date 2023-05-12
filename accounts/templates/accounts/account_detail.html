@@ -34,7 +34,25 @@
 <!-- End Action buttons -->
 {% endif %}
 
+{% comment %} <h3>Finished Annotating</h3>
+{% for image in annotated_images %}
+  <p>{{ image.name }}</p>
+{% endfor %}
+
+<h3>To Annotate</h3>
+{% for image in images_to_annotate %}
+  <p>{{ image.name }}</a></p>
+{% endfor %}
+
+<h3>Finished Evaluating</h3>
+{% for question in answered_questions %}
+  <p>{{ question.description }} (Task: {{ question.task.description }})</p>
+{% endfor %}
+
+<h3>To Evaluate</h3>
+{% for question in questions_to_evaluate %}
+  <p>{{ question.description }} (Task: {{ question.task.description }})</a></p>
+{% endfor %} {% endcomment %}
 
 </div>
 {% endblock content %}
-

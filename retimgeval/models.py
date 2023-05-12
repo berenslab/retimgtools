@@ -10,6 +10,7 @@ class Consent(models.Model):
         User, on_delete=models.CASCADE, related_name="retimgeval_consent"
     )
     consented = models.BooleanField(default=False)
+    consented_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
 
 class Task(models.Model):

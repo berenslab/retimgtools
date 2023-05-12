@@ -72,7 +72,6 @@
 </div>
 
 <script>
-
     const colors = {
         "MA": "red",
         "HE": "blue",
@@ -116,29 +115,11 @@
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
-        
-        // Clear the magnifier canvas
-        magnifierCtx.clearRect(0, 0, magnifierCanvas.width, magnifierCanvas.height);
-        
-        // Draw the magnified portion of the image
-        magnifierCtx.drawImage(
-            canvas, 
-            x - magnifierSize / (2 * zoomLevel), 
-            y - magnifierSize / (2 * zoomLevel), 
-            magnifierSize / zoomLevel, 
-            magnifierSize / zoomLevel, 
-            0, 
-            0, 
-            magnifierSize, 
-            magnifierSize
-        );
-        magnifierCtx.beginPath();
-        magnifierCtx.arc(magnifierSize / 2, magnifierSize / 2, 5, 0, 2 * Math.PI);
-        magnifierCtx.stroke();
+
+        drawMagnifier(x, y);
     });
 
     canvas.addEventListener('click', (event) => {
-
         if (!selectedLabel) {
             alert('Please select a label first.');
             return;
@@ -149,44 +130,36 @@
         const rect = canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
-        
+
         // Draw the dot
         ctx.fillStyle = color;
         ctx.beginPath();
         ctx.arc(x, y, 2, 0, 2 * Math.PI);
         ctx.fill();
 
-        magnifierCtx.drawImage(canvas, 
-            x - magnifierSize / (2 * zoomLevel), 
-            y - magnifierSize / (2 * zoomLevel), 
-            magnifierSize / zoomLevel, 
-            magnifierSize / zoomLevel, 
-            0, 
-            0, 
-            magnifierSize, 
-            magnifierSize
-        );
+        drawMagnifier(x, y);
 
+        let selectedLabel_logged;
         if (selectedLabel === 'OTHER') {
-            selectedLabel_logged = otherLabelInput.value;
+            selectedLabel_logged = document.getElementById('otherLabelInput').value;
         } else {
             selectedLabel_logged = selectedLabel;
-        };
-        let coordinate = {label: selectedLabel_logged, x:x, y:y, color: color}
+        }
+
+        let coordinate = {label: selectedLabel_logged, x:x, y:y, color: color};
         coordinates.push(coordinate);
 
         let coordinateElement = document.createElement('div');
         coordinateElement.style.display = "flex";
         coordinateElement.style.alignItems = "center";
-        
+
         let colorSquare = document.createElement('div');
         colorSquare.innerHTML = '&#9632;';
         colorSquare.style.color = colors[selectedLabel];
-        console.log(colorSquare.style.color);
         colorSquare.style.float = 'left';
         colorSquare.style.marginRight = '10px'; // Add a bit of space after the color square
         coordinateElement.appendChild(colorSquare);
-        
+
         let textNode = document.createTextNode(`X: ${x}, Y: ${y}, Label: ${selectedLabel_logged}`);
         coordinateElement.appendChild(textNode);
 
@@ -212,17 +185,54 @@
         form.submit();
     });
 
-    // Get the selected label
-    function getSelectedLabel() {
-        for (let i = 0; i < radios.length; i++) {
-            if (radios[i].checked) {
-                if (radios[i].value === 'OTHER') {
-                    return otherText.value;
-                } else {
-                    return radios[i].value;
-                }
-            }
+    function drawMagnifier(x, y) {
+        // Calculate source coordinates and dimensions
+        let sourceX = x - magnifierSize / (2 * zoomLevel);
+        let sourceY = y - magnifierSize / (2 * zoomLevel);
+        let sourceWidth = magnifierSize / zoomLevel;
+        let sourceHeight = magnifierSize / zoomLevel;
+
+        // Calculate destination coordinates
+        let destX = 0;
+        let destY = 0;
+
+        // Check if sourceX is out of the image
+        if (sourceX < 0) {
+            sourceWidth += sourceX;
+            destX -= sourceX * zoomLevel;
+            sourceX = 0;
         }
+
+        // Check if sourceY is out of the image
+        if (sourceY < 0) {
+            sourceHeight += sourceY;
+            destY -= sourceY * zoomLevel;
+            sourceY = 0;
+        }
+
+        // Clear the magnifier canvas
+        magnifierCtx.clearRect(0, 0, magnifierCanvas.width, magnifierCanvas.height);
+
+        // Draw white background to fill the outside region
+        magnifierCtx.fillStyle = 'white';
+        magnifierCtx.fillRect(0, 0, magnifierCanvas.width, magnifierCanvas.height);
+
+        // Draw the magnified portion of the image
+        magnifierCtx.drawImage(
+            canvas, 
+            sourceX, 
+            sourceY, 
+            sourceWidth, 
+            sourceHeight, 
+            destX, 
+            destY, 
+            sourceWidth * zoomLevel, 
+            sourceHeight * zoomLevel
+        );
+
+        magnifierCtx.beginPath();
+        magnifierCtx.arc(magnifierSize / 2, magnifierSize / 2, 5, 0, 2 * Math.PI);
+        magnifierCtx.stroke();
     }
 
     function deleteCoordinate(coordinate, coordinateElement) {
@@ -242,6 +252,7 @@
         }
     }
 </script>
+
 
 
 

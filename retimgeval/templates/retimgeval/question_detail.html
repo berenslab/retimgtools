@@ -5,7 +5,6 @@
 
 {% if user.is_authenticated %}
 
-
 <h1>{{ question.description }}</h1>
 
 <table>
@@ -85,26 +84,62 @@
         });
     };
 
+    const drawMagnifier = (x, y, imageCanvas, magnifierCanvas) => {
+        const magnifierCtx = magnifierCanvas.getContext('2d');
+        // Calculate source coordinates and dimensions
+        let sourceX = x - magnifierSize / (2 * zoomLevel);
+        let sourceY = y - magnifierSize / (2 * zoomLevel);
+        let sourceWidth = magnifierSize / zoomLevel;
+        let sourceHeight = magnifierSize / zoomLevel;
+
+        // Calculate destination coordinates
+        let destX = 0;
+        let destY = 0;
+
+        // Check if sourceX is out of the image
+        if (sourceX < 0) {
+            sourceWidth += sourceX;
+            destX -= sourceX * zoomLevel;
+            sourceX = 0;
+        }
+
+        // Check if sourceY is out of the image
+        if (sourceY < 0) {
+            sourceHeight += sourceY;
+            destY -= sourceY * zoomLevel;
+            sourceY = 0;
+        }
+
+        // Clear the magnifier canvas
+        magnifierCtx.clearRect(0, 0, magnifierCanvas.width, magnifierCanvas.height);
+
+        // Draw white background to fill the outside region
+        magnifierCtx.fillStyle = 'white';
+        magnifierCtx.fillRect(0, 0, magnifierCanvas.width, magnifierCanvas.height);
+
+        // Draw the magnified portion of the image
+        magnifierCtx.drawImage(
+            imageCanvas, 
+            sourceX, 
+            sourceY, 
+            sourceWidth, 
+            sourceHeight, 
+            destX, 
+            destY, 
+            sourceWidth * zoomLevel, 
+            sourceHeight * zoomLevel
+        );
+
+        magnifierCtx.beginPath();
+        magnifierCtx.arc(magnifierSize / 2, magnifierSize / 2, 5, 0, 2 * Math.PI);
+        magnifierCtx.strokeStyle = 'black';
+        magnifierCtx.lineWidth = 2;
+        magnifierCtx.stroke();
+    };
+
     const updateMagnifiers = (x, y, imageCanvas) => {
         imageCanvases.forEach((imageCanvas, index) => {
-            const magnifierCtx = magnifierCanvases[index].getContext('2d');
-            magnifierCtx.clearRect(0, 0, magnifierCanvases[index].width, magnifierCanvases[index].height);
-            magnifierCtx.drawImage(
-                imageCanvas,
-                Math.max(0, x - magnifierSize / (2 * zoomLevel)), 
-                Math.max(0, y - magnifierSize / (2 * zoomLevel)), 
-                Math.min(magnifierSize / zoomLevel, imageCanvas.width - x + magnifierSize / (2 * zoomLevel)), 
-                Math.min(magnifierSize / zoomLevel, imageCanvas.height - y + magnifierSize / (2 * zoomLevel)), 
-                0, 
-                0, 
-                Math.min(magnifierSize, magnifierSize * (imageCanvas.width - x + magnifierSize / (2 * zoomLevel)) / (magnifierSize / zoomLevel)), 
-                Math.min(magnifierSize, magnifierSize * (imageCanvas.height - y + magnifierSize / (2 * zoomLevel)) / (magnifierSize / zoomLevel))
-            );
-            magnifierCtx.beginPath();
-            magnifierCtx.arc(magnifierSize / 2, magnifierSize / 2, 5, 0, 2 * Math.PI);
-            magnifierCtx.strokeStyle = 'black';
-            magnifierCtx.lineWidth = 2;
-            magnifierCtx.stroke();
+            drawMagnifier(x, y, imageCanvas, magnifierCanvases[index]);
         });
     };
 
@@ -130,16 +165,17 @@
                 const y = event.clientY - rect.top;
                 updateMagnifiers(x, y, imageCanvas);
             });
-
+    
             imageCanvas.addEventListener('mouseleave', function() {
                 clearMagnifiers();
             });
             {% endif %}
         };
-
+    
         img.src = imageCanvas.getAttribute('data-src');
-    }
+        }
 </script>
+
 
 
 {% else %}

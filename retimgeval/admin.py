@@ -7,7 +7,7 @@ from .models import Answer, Choice, Consent, Question, Task
 # Register your models here.
 @admin.register(Consent)
 class ConsentAdmin(admin.ModelAdmin):
-    list_display = ["user", "consented"]
+    list_display = ["user", "consented", "consented_at"]
 
 
 class ChoiceInline(admin.TabularInline):

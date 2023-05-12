@@ -6,7 +6,7 @@ from .models import Annotation, Consent, Image
 
 @admin.register(Consent)
 class ConsentAdmin(admin.ModelAdmin):
-    list_display = ["user", "consented"]
+    list_display = ["user", "consented", "consented_at"]
 
 
 @admin.register(Image)
@@ -16,7 +16,9 @@ class ImageAdmin(admin.ModelAdmin):
 
 @admin.register(Annotation)
 class AnnotationAdmin(admin.ModelAdmin):
-    list_display = ["user", "image", "coordinates"]
-    list_filter = ("user", "image")
+    list_display = ["user", "image", "coordinates", "created_at"]
+    list_filter = [
+        "user",
+    ]
 
     actions = [csvexport]
