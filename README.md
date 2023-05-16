@@ -1,6 +1,10 @@
 # Retinal Image Annotation and Evaluation Tools
 
-## Usage
+## Demo
+
+https://retimgtools.fly.dev
+
+## Run locally
 
 ```shell
 pip install -r requirements.txt
