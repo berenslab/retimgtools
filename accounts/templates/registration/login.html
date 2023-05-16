@@ -9,5 +9,5 @@
     {{ form|crispy }}
     <button class="btn btn-success ml-2" type="submit">Log In</button>
 </form>
-<p><a href="{% url 'password_reset' %}">Forgot your passworld?</a></p>
+{% comment %} <p><a href="{% url 'password_reset' %}">Forgot your passworld?</a></p> {% endcomment %}
 {% endblock content %}

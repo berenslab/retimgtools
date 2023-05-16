@@ -17,24 +17,6 @@ class SignUpView(CreateView):
     template_name = "registration/signup.html"
 
 
-from django.contrib.auth import get_user_model
-
-# class AccountDetailView(LoginRequiredMixin, DetailView):
-#     model = User
-#     slug_field = "username"
-#     slug_url_kwarg = "username"
-#     template_name = "accounts/account_detail.html"
-#     all_tasks = Task.objects.all()
-#     all_images = Image.objects.all()
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic.detail import DetailView
-
-from retimgann.models import Annotation, Image
-from retimgeval.models import Answer, Question, Task
-
-User = get_user_model()
-
-
 class AccountDetailView(LoginRequiredMixin, DetailView):
     model = User
     slug_field = "username"
