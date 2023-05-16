@@ -19,7 +19,7 @@ COPY . /code
 
 # RUN python manage.py collectstatic --noinput
 RUN python manage.py migrate
-RUN python populate.py
+# RUN python populate.py
 
 EXPOSE 8000
 

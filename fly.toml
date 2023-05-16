@@ -1,15 +1,11 @@
-# fly.toml app configuration file generated for retimgtools on 2023-05-12T16:01:05+02:00
+# fly.toml app configuration file generated for retimgtools on 2023-05-16T10:50:08+02:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
 app = "retimgtools"
-kill_signal = "SIGINT"
-kill_timeout = 5
 primary_region = "ams"
-processes = []
-
-[build]
+console_command = "/code/manage.py shell"
 
 [deploy]
   release_command = "python manage.py migrate"
@@ -17,35 +13,12 @@ processes = []
 [env]
   PORT = "8000"
 
-[experimental]
-  auto_rollback = true
-
-[[services]]
-  http_checks = []
+[http_service]
   internal_port = 8000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
   min_machines_running = 0
-  processes = ["app"]
-  protocol = "tcp"
-  script_checks = []
-  [services.concurrency]
-    hard_limit = 25
-    soft_limit = 20
-    type = "connections"
-
-  [[services.ports]]
-    force_https = true
-    handlers = ["http"]
-    port = 80
-
-  [[services.ports]]
-    handlers = ["tls", "http"]
-    port = 443
-
-  [[services.tcp_checks]]
-    grace_period = "1s"
-    interval = "15s"
-    restart_limit = 0
-    timeout = "2s"
 
 [[statics]]
   guest_path = "/code/static"

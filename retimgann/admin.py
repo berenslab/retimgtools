@@ -14,11 +14,18 @@ class ImageAdmin(admin.ModelAdmin):
     list_display = ["id", "image", "name"]
 
 
-@admin.register(Annotation)
 class AnnotationAdmin(admin.ModelAdmin):
-    list_display = ["user", "image", "coordinates", "created_at"]
+    list_display = [
+        "user",
+        "image",
+        "coordinates",
+        "created_at",
+    ]
     list_filter = [
         "user",
     ]
 
     actions = [csvexport]
+
+
+admin.site.register(Annotation, AnnotationAdmin)
