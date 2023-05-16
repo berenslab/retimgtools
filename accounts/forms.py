@@ -55,26 +55,28 @@ class CustomUserCreationForm(UserCreationForm):
             invitation = InvitationCode.objects.get(code=code)
             invitation.is_used = True
             invitation.save()
+            user.save()
         else:
             user.is_staff = True
 
-            if commit:
-                user.save()
+        if commit:
+            user.save()
 
-                # Give the user permissions to view and edit multiple models
-                if user.is_staff:
-                    app_model_pairs = [
-                        ("retimgann", "annotation"),
-                        ("retimgeval", "answer"),
-                    ]
+            # Give the user permissions to view and edit multiple models
+            if user.is_staff:
+                app_model_pairs = [
+                    ("accounts", "invitationcode"),
+                    ("retimgann", "annotation"),
+                    ("retimgeval", "answer"),
+                ]
 
-                    for app_label, model_name in app_model_pairs:
-                        permissions = Permission.objects.filter(
-                            content_type__app_label=app_label,
-                            content_type__model=model_name,
-                        )
-                        for permission in permissions:
-                            user.user_permissions.add(permission)
+                for app_label, model_name in app_model_pairs:
+                    permissions = Permission.objects.filter(
+                        content_type__app_label=app_label,
+                        content_type__model=model_name,
+                    )
+                    for permission in permissions:
+                        user.user_permissions.add(permission)
 
         return user
 
