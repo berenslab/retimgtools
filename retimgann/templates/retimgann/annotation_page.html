@@ -217,11 +217,11 @@
 
     form.addEventListener('submit', (event) => {
         // Check if coordinates array is empty
-        if (coordinates.length === 0) {
+        {% comment %} if (coordinates.length === 0) {
             alert('No coordinates have been logged. Please annotate the image before submitting.');
             event.preventDefault();
             return;
-        }
+        } {% endcomment %}
     
         event.preventDefault();
 
