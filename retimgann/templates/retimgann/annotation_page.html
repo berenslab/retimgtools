@@ -15,6 +15,10 @@
         <canvas id="magnifierCanvas" width="150" height="150" style="border:1px solid #d3d3d3"></canvas>
     </div>
     <div class="col">
+        <h5>Logged Coordinates</h5>
+        <div id="print_coordinates"></div>
+        <br/>
+        <h5>Labels</h5>
         <form id="annotationForm" method="post">
             {% csrf_token %}
             <div id="labels">
@@ -67,7 +71,6 @@
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
-        <div id="print_coordinates"></div>
     </div>
 </div>
 
@@ -100,6 +103,8 @@
     let selectedLabel = null;
     let coordinates = [];
     let lastHighlightedDot = null;
+    let lastHighlightedDotImage = null; // Stores the image data before drawing highlight
+
 
     document.querySelectorAll('input[name="label"]').forEach((radio) => {
         radio.addEventListener('change', (event) => {
@@ -129,8 +134,27 @@
         let label = selectedLabel;
         let color = colors[selectedLabel];
         const rect = canvas.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
+        const x = Math.round(event.clientX - rect.left);
+        const y = Math.round(event.clientY - rect.top);
+
+        // Check if click was on a dot
+        const allCoordinateElements = document.querySelectorAll('#print_coordinates > div');
+        for (let i = 0; i < coordinates.length; i++) {
+            let coordinate = coordinates[i];
+            let dx = x - coordinate.x;
+            let dy = y - coordinate.y;
+            if (Math.sqrt(dx * dx + dy * dy) <= coordinate.radius) {
+                // Click was inside this dot
+                // highlight and show this dot
+                showDot(coordinate);
+                // Find the corresponding div and highlight it
+                const correspondingDiv = Array.from(allCoordinateElements).find(el => el.dataset.x == coordinate.x && el.dataset.y == coordinate.y);
+                if (correspondingDiv) {
+                    highlightCoordinateElement(correspondingDiv, true);  // Scroll when dot is selected on canvas
+                }
+                return;
+            }
+        }
 
         // Draw the dot
         ctx.fillStyle = color;
@@ -147,12 +171,14 @@
             selectedLabel_logged = selectedLabel;
         }
 
-        let coordinate = {label: selectedLabel_logged, x:x, y:y, color: color};
+        let coordinate = {label: selectedLabel_logged, x:x, y:y, color: color, radius: 4};
         coordinates.push(coordinate);
 
         let coordinateElement = document.createElement('div');
         coordinateElement.style.display = "flex";
         coordinateElement.style.alignItems = "center";
+        coordinateElement.dataset.x = x;  // Store the x and y in the element
+        coordinateElement.dataset.y = y;
 
         let colorSquare = document.createElement('div');
         colorSquare.innerHTML = '&#9632;';
@@ -162,14 +188,20 @@
         coordinateElement.appendChild(colorSquare);
 
         let textNode = document.createTextNode(`X: ${x}, Y: ${y}, Label: ${selectedLabel_logged}`);
-        coordinateElement.appendChild(textNode);
+        let textDiv = document.createElement('div');
+        textDiv.style.width = '200px';  // Set this to a value that suits your needs
+        textDiv.appendChild(textNode);
+        coordinateElement.appendChild(textDiv);
 
         let showButton = document.createElement('button');
         showButton.textContent = 'Show';
         showButton.className = 'btn btn-info';
         showButton.style.marginLeft = '10px';
         showButton.style.transform = 'scale(0.8)'; // make button 20% smaller
-        showButton.addEventListener('click', () => showDot(coordinate, coordinateElement));
+        showButton.addEventListener('click', () => {
+            showDot(coordinate);
+            highlightCoordinateElement(coordinateElement, false);
+        });
         coordinateElement.appendChild(showButton);
 
         let deleteButton = document.createElement('button');
@@ -180,15 +212,29 @@
         deleteButton.addEventListener('click', () => deleteCoordinate(coordinate, coordinateElement));
         coordinateElement.appendChild(deleteButton);
         coordinatesContainer.appendChild(coordinateElement);
+        coordinatesContainer.scrollTop = coordinatesContainer.scrollHeight;
     });
 
     form.addEventListener('submit', (event) => {
+        // Check if coordinates array is empty
+        if (coordinates.length === 0) {
+            alert('No coordinates have been logged. Please annotate the image before submitting.');
+            event.preventDefault();
+            return;
+        }
+    
         event.preventDefault();
+
+        // Create a new array that only contains the required properties for each coordinate
+        let coordinatesToSubmit = coordinates.map(coordinate => {
+            return {label: coordinate.label, x: coordinate.x, y: coordinate.y, color: coordinate.color};
+        });
+
         // Add coordinates to form
         const input = document.createElement('input');
         input.type = 'hidden';
         input.name = 'coordinates';
-        input.value = JSON.stringify(coordinates);
+        input.value = JSON.stringify(coordinatesToSubmit);
         form.appendChild(input);
         // Submit the form
         form.submit();
@@ -240,30 +286,44 @@
         );
 
         magnifierCtx.beginPath();
-        magnifierCtx.arc(magnifierSize / 2, magnifierSize / 2, 5, 0, 2 * Math.PI);
+        magnifierCtx.arc(magnifierSize / 2, magnifierSize / 2, 2, 0, 2 * Math.PI);
         magnifierCtx.stroke();
     }
 
     function showDot(coordinate, coordinateElement) {
         if (lastHighlightedDot) {
-            // Remove highlight from last highlighted dot
-            ctx.clearRect(lastHighlightedDot.x - 5, lastHighlightedDot.y - 5, 10, 10);
-            ctx.beginPath();
-            ctx.arc(lastHighlightedDot.x, lastHighlightedDot.y, 2, 0, 2 * Math.PI);
-            ctx.fillStyle = lastHighlightedDot.color;
-            ctx.fill();
+            // Restore the image data from before the last highlighted dot was drawn
+            ctx.putImageData(lastHighlightedDotImage, lastHighlightedDot.x - 5, lastHighlightedDot.y - 5);
         }
-
+    
+        // Store the image data from before the new dot highlight is drawn
+        lastHighlightedDotImage = ctx.getImageData(coordinate.x - 5, coordinate.y - 5, 10, 10);
+    
         // Highlight the current dot
         ctx.beginPath();
         ctx.arc(coordinate.x, coordinate.y, 3, 0, 2 * Math.PI);
         ctx.strokeStyle = 'gray';
         ctx.lineWidth = 3;
         ctx.stroke();
-
+    
         lastHighlightedDot = coordinate;
     }
 
+    function highlightCoordinateElement(element, scrollIntoView = true) {
+        // Remove highlight from all elements
+        const allCoordinateElements = document.querySelectorAll('#print_coordinates > div');
+        allCoordinateElements.forEach(el => el.style.backgroundColor = '');
+    
+        // Highlight the selected element
+        element.style.backgroundColor = '#d0d0d0';
+    
+        // Scroll the selected element into view if requested
+        if (scrollIntoView) {
+            element.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+        }
+    }
+    
+    
     function deleteCoordinate(coordinate, coordinateElement) {
         let index = coordinates.indexOf(coordinate);
         if (index > -1) {
@@ -271,18 +331,66 @@
         }
         coordinatesContainer.removeChild(coordinateElement);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // redraw the remaining annotations
-        for (let i = 0; i < coordinates.length; i++) {
-            let coordinate = coordinates[i];
-            ctx.beginPath();
-            ctx.arc(coordinate.x, coordinate.y, 2, 0, 2 * Math.PI);
-            ctx.fillStyle = coordinate.color;
-            ctx.fill();
+        // Redraw the image
+        img.onload = function() {
+            ctx.drawImage(img, 0, 0, 512, 512);
+            // Redraw the remaining annotations
+            for (let i = 0; i < coordinates.length; i++) {
+                let coordinate = coordinates[i];
+                ctx.beginPath();
+                ctx.arc(coordinate.x, coordinate.y, 2, 0, 2 * Math.PI);
+                ctx.fillStyle = coordinate.color;
+                ctx.fill();
+            }
+        };
+        img.src = '{{ image.image.url }}';
+        if (lastHighlightedDot === coordinate) {
+            lastHighlightedDot = null;
+            lastHighlightedDotImage = null;
         }
     }
 </script>
 
+<style>
+    #print_coordinates {
+        height: 230px;
+        overflow-y: auto;
+        border: 1px solid #000;
+        padding: 10px;
+        margin-top: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        border-radius: 5px;
+    }
+    
+    #print_coordinates::-webkit-scrollbar {
+        width: 10px;
+    }
+    
+    #print_coordinates::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 5px;
+    }
+    
+    #print_coordinates::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
 
+    #print_coordinates > div {
+        align-items: center;
+        gap: 10px;
+    }
+
+    #print_coordinates > div > div {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .highlighted {
+        background-color: #ADD8E6; /* light blue */
+        color: black;
+    }
+</style>
 
 
 {% else %}
