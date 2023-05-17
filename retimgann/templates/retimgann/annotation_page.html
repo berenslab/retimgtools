@@ -99,6 +99,7 @@
 
     let selectedLabel = null;
     let coordinates = [];
+    let lastHighlightedDot = null;
 
     document.querySelectorAll('input[name="label"]').forEach((radio) => {
         radio.addEventListener('change', (event) => {
@@ -162,6 +163,14 @@
 
         let textNode = document.createTextNode(`X: ${x}, Y: ${y}, Label: ${selectedLabel_logged}`);
         coordinateElement.appendChild(textNode);
+
+        let showButton = document.createElement('button');
+        showButton.textContent = 'Show';
+        showButton.className = 'btn btn-info';
+        showButton.style.marginLeft = '10px';
+        showButton.style.transform = 'scale(0.8)'; // make button 20% smaller
+        showButton.addEventListener('click', () => showDot(coordinate, coordinateElement));
+        coordinateElement.appendChild(showButton);
 
         let deleteButton = document.createElement('button');
         deleteButton.textContent = 'Delete';
@@ -233,6 +242,26 @@
         magnifierCtx.beginPath();
         magnifierCtx.arc(magnifierSize / 2, magnifierSize / 2, 5, 0, 2 * Math.PI);
         magnifierCtx.stroke();
+    }
+
+    function showDot(coordinate, coordinateElement) {
+        if (lastHighlightedDot) {
+            // Remove highlight from last highlighted dot
+            ctx.clearRect(lastHighlightedDot.x - 5, lastHighlightedDot.y - 5, 10, 10);
+            ctx.beginPath();
+            ctx.arc(lastHighlightedDot.x, lastHighlightedDot.y, 2, 0, 2 * Math.PI);
+            ctx.fillStyle = lastHighlightedDot.color;
+            ctx.fill();
+        }
+
+        // Highlight the current dot
+        ctx.beginPath();
+        ctx.arc(coordinate.x, coordinate.y, 3, 0, 2 * Math.PI);
+        ctx.strokeStyle = 'gray';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        lastHighlightedDot = coordinate;
     }
 
     function deleteCoordinate(coordinate, coordinateElement) {
