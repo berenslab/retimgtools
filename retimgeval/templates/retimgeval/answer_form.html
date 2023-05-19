@@ -1,7 +1,7 @@
 <h2>Answer</h2>
 <form action="{{ question.get_absolute_url}}" method="POST">
   {{ form.as_p }} {% csrf_token %}
-  <p><input type="submit" value="submit" /></p>
+  <button type="submit" class="btn btn-primary">Submit</button>
 </form>
 
 {% comment %} javascript code to record the time spent on filling out the form

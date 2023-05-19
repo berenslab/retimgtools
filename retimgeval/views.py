@@ -1,8 +1,10 @@
+from django.http import Http404
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.generic import CreateView, View
 
 from .forms import AnswerForm, ConsentForm
-from .models import Choice, Consent, Question, Task
+from .models import Answer, Choice, Consent, Question, Task
 
 
 class LandingPageView(CreateView):
@@ -41,9 +43,34 @@ def task_list(request):
     return render(request, "retimgeval/task_list.html", context)
 
 
+def get_next_unanswered_question(request, current_task):
+    unanswered_questions = (
+        Question.objects.filter(task=current_task)
+        .exclude(answer__user=request.user)
+        .order_by("pk")
+    )
+
+    if unanswered_questions:
+        return unanswered_questions.first()
+    else:
+        return None
+
+
 def question_detail(request, slug):
     question = Question.objects.get(slug=slug)
     task = Task.objects.get(pk=question.task.pk)
+
+    if Answer.objects.filter(question=question, user=request.user).exists():
+        # This question has already been answered
+        next_question = get_next_unanswered_question(request, task)
+
+        if next_question:
+            # There is another question in this task
+            return redirect("retimgeval:question_detail", slug=next_question.slug)
+        else:
+            # This was the last question in this task
+            return redirect("retimgeval:thank_you", pk=task.pk)
+
     choices = question.choice_set.all()
 
     if request.method == "POST":
@@ -53,7 +80,6 @@ def question_detail(request, slug):
             question_id=form.question.pk
         )
 
-        option = None
         if form.is_valid():
             option = form.save(commit=False)
             option.reaction_time = request.POST.get("reaction_time", None)
@@ -61,21 +87,15 @@ def question_detail(request, slug):
             option.question = question
             option.user = request.user
             option.save()
-            try:
-                # if task.pk != 1 and question.slug[-1] == "1":
-                if question.task.id != 1 and question.slug[-1] == "1":
-                    new_slug = slug[:-1] + "2"
-                    Question.objects.get(slug=new_slug)
-                    return redirect("retimgeval:question_detail", slug=new_slug)
-                else:
-                    new_slug = slug[:-3] + f"{int(slug[-3])+1}p1"
-                    Question.objects.get(slug=new_slug)
-                    return redirect(
-                        "retimgeval:question_detail",
-                        slug=new_slug,
-                    )
-            except:
-                return redirect("retimgeval:task_list")
+
+            next_question = get_next_unanswered_question(request, task)
+            if next_question:
+                # There is another question in this task
+                return redirect("retimgeval:question_detail", slug=next_question.slug)
+            else:
+                # This was the last question in this task
+                return redirect("retimgeval:thank_you", pk=task.pk)
+
     else:
         form = AnswerForm()
         form.question = question
@@ -92,3 +112,23 @@ def question_detail(request, slug):
     }
 
     return render(request, "retimgeval/question_detail.html", context)
+
+
+class ThankYouPageView(View):
+    def get(self, request, pk):
+        task = Task.objects.get(pk=pk)
+        next_task = Task.objects.filter(pk__gt=task.pk).order_by("pk").first()
+
+        if next_task:
+            next_link = reverse(
+                "retimgeval:task_instruction", kwargs={"pk": next_task.pk}
+            )
+        else:
+            next_link = None
+
+        context = {
+            "task": task,
+            "next_link": next_link,
+        }
+
+        return render(request, "retimgeval/thank_you.html", context)
