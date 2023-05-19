@@ -15,7 +15,10 @@
         <canvas id="magnifierCanvas" width="150" height="150" style="border:1px solid #d3d3d3"></canvas>
     </div>
     <div class="col">
-        <h5>Logged Coordinates</h5>
+        <div class="coordinate-header">
+            <h5>Logged Coordinates</h5>
+            <button id="deleteAllButton" class="btn btn-danger">Delete All</button>
+        </div>
         <div id="print_coordinates"></div>
         <br/>
         <h5>Labels</h5>
@@ -93,6 +96,7 @@
     img.src = '{{ image.image.url }}';
     img.onload = function() {
         ctx.drawImage(img, 0, 0, 512, 512);
+        loadExistingCoordinates();
     };
 
     const magnifierCanvas = document.getElementById('magnifierCanvas');
@@ -286,7 +290,7 @@
         );
 
         magnifierCtx.beginPath();
-        magnifierCtx.arc(magnifierSize / 2, magnifierSize / 2, 2, 0, 2 * Math.PI);
+        magnifierCtx.arc(magnifierSize / 2, magnifierSize / 2, 5, 0, 2 * Math.PI); // x, y, radius, startAngle, endAngle
         magnifierCtx.stroke();
     }
 
@@ -353,6 +357,33 @@
             lastHighlightedDotImage = null;
         }
     }
+
+    deleteAllButton.addEventListener('click', function() {
+        // Ask for confirmation before deleting all
+        if (window.confirm("Are you sure you want to delete all annotations? This action cannot be undone.")) {
+            // Clear the coordinates array
+            coordinates.length = 0;
+    
+            // Remove all the coordinate elements from the DOM
+            while (coordinatesContainer.firstChild) {
+                coordinatesContainer.firstChild.remove();
+            }
+    
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+            // Redraw the image
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, 512, 512);
+            };
+            img.src = '{{ image.image.url }}';
+    
+            // Reset highlighted dot
+            lastHighlightedDot = null;
+            lastHighlightedDotImage = null;
+        }
+    });
+    
 </script>
 
 <style>
@@ -393,6 +424,12 @@
     .highlighted {
         background-color: #ADD8E6; /* light blue */
         color: black;
+    }
+
+    .coordinate-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 </style>
 
