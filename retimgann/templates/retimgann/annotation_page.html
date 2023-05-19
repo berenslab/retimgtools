@@ -130,13 +130,7 @@
     });
 
     canvas.addEventListener('click', (event) => {
-        if (!selectedLabel) {
-            alert('Please select a label first.');
-            return;
-        }
 
-        let label = selectedLabel;
-        let color = colors[selectedLabel];
         const rect = canvas.getBoundingClientRect();
         const x = Math.round(event.clientX - rect.left);
         const y = Math.round(event.clientY - rect.top);
@@ -159,6 +153,14 @@
                 return;
             }
         }
+
+        if (!selectedLabel) {
+            alert('Please select a label first.');
+            return;
+        }
+        
+        let label = selectedLabel;
+        let color = colors[selectedLabel];
 
         // Draw the dot
         ctx.fillStyle = color;
