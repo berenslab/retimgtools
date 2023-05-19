@@ -10,6 +10,17 @@ class LandingPageView(CreateView):
     form_class = ConsentForm
     template_name = "retimgeval/landing_page.html"
 
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            # Check if user has already given consent
+            user_consent = Consent.objects.filter(
+                user=request.user, consented=True
+            ).first()
+            if user_consent:
+                # If user has given consent, redirect to the annotation page
+                return redirect("retimgeval:task_list")
+        return super().get(request, *args, **kwargs)
+
     def form_valid(self, form):
         form.instance.user = self.request.user
         form.save()
