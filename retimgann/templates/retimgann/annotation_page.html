@@ -383,6 +383,79 @@
             lastHighlightedDotImage = null;
         }
     });
+
+    function loadExistingCoordinates() {
+        let existingAnnotationsString = '{{ existing_annotation|escapejs|safe }}';
+        // Replace \u0027 with "
+        existingAnnotationsString = existingAnnotationsString.replace(/\\u0027/g, '"');
+        const existingAnnotations = JSON.parse(existingAnnotationsString);
+        console.log('existingAnnotations: ', existingAnnotations);  // This should show your annotation data
+        for (let i = 0; i < existingAnnotations.length; i++) {
+            const annotation = existingAnnotations[i];
+            const label = annotation.label;
+            const color = colors[label];
+            const x = annotation.x;
+            const y = annotation.y;
+    
+            // Draw the dot
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(x, y, 2, 0, 2 * Math.PI);
+            ctx.fill();
+    
+            // Add the dot to the coordinates array
+            coordinates.push({label: label, x: x, y: y, color: color, radius: 4});
+    
+            // Log the coordinate
+            // Create the coordinate element
+            let coordinateElement = document.createElement('div');
+            coordinateElement.style.display = "flex";
+            coordinateElement.style.alignItems = "center";
+            coordinateElement.dataset.x = x;  // Store the x and y in the element
+            coordinateElement.dataset.y = y;
+
+            // Create the color square
+            let colorSquare = document.createElement('div');
+            colorSquare.innerHTML = '&#9632;';
+            colorSquare.style.color = colors[label];
+            colorSquare.style.float = 'left';
+            colorSquare.style.marginRight = '10px'; // Add a bit of space after the color square
+            coordinateElement.appendChild(colorSquare);
+
+            // Create the text node
+            let textNode = document.createTextNode(`X: ${x}, Y: ${y}, Label: ${label}`);
+            let textDiv = document.createElement('div');
+            textDiv.style.width = '200px';  // Set this to a value that suits your needs
+            textDiv.appendChild(textNode);
+            coordinateElement.appendChild(textDiv);
+
+            // Create the show button
+            let showButton = document.createElement('button');
+            showButton.textContent = 'Show';
+            showButton.className = 'btn btn-info';
+            showButton.style.marginLeft = '10px';
+            showButton.style.transform = 'scale(0.8)'; // make button 20% smaller
+            showButton.addEventListener('click', () => {
+                showCoordinate({label: label, x: x, y: y, color: color, radius: 4});
+                highlightCoordinateElement(coordinateElement, false);
+            });
+            coordinateElement.appendChild(showButton);
+
+            // Create the delete button
+            let deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.className = 'btn btn-danger';
+            deleteButton.style.marginLeft = '10px';
+            deleteButton.style.transform = 'scale(0.8)'; // make button 20% smaller
+            deleteButton.addEventListener('click', () => deleteCoordinate({label: label, x: x, y: y, color: color, radius: 4}, coordinateElement));
+            coordinateElement.appendChild(deleteButton);
+
+            // Append the coordinate element to the coordinates container
+            coordinatesContainer.appendChild(coordinateElement);
+
+        }
+    }
+    
     
 </script>
 

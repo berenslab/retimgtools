@@ -3,6 +3,7 @@ import json
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 from django.views.generic import CreateView, View
 
 from .forms import AnnotationForm, ConsentForm
@@ -39,36 +40,59 @@ def annotate(request, image_id):
     try:
         image = Image.objects.get(id=image_id)
         total_num_images = Image.objects.count()
+
         if request.method == "POST":
             # Annotation form submitted
-            coordinates = request.POST.get("coordinates")
-            annotation = Annotation(
-                user=request.user, image=image, coordinates=coordinates
+            coordinates = json.loads(request.POST.get("coordinates"))
+            annotation, created = Annotation.objects.get_or_create(
+                user=request.user,
+                image=image,
+                defaults={"coordinates": json.dumps(coordinates)},
             )
-            annotation.save()
+            if not created:
+                # if the annotation already exists, update the coordinates
+                annotation.coordinates = json.dumps(coordinates)
+                annotation.save()
             return redirect("retimgann:annotation_page", image_id=image_id + 1)
-    except:
+    except ObjectDoesNotExist:
         return redirect("retimgann:thank_you")
 
-    # Render the annotation form
+    existing_annotation = Annotation.objects.filter(
+        user=request.user, image=image
+    ).first()
     return render(
         request,
         "retimgann/annotation_page.html",
-        {"image": image, "total_num_images": total_num_images},
+        {
+            "image": image,
+            "total_num_images": total_num_images,
+            "existing_annotation": mark_safe(
+                json.dumps(json.loads(existing_annotation.coordinates))
+            )
+            if existing_annotation
+            else [],
+        },
     )
 
 
 def annotate_submit(request):
     if request.method == "POST":
         # Annotation form submitted
-        coordinates = request.POST.get("coordinates")
+        coordinates = json.loads(request.POST.get("coordinates"))
         image_id = request.POST.get("image_id")
         image = Image.objects.get(id=image_id)
-        annotation = Annotation(user=request.user, image=image, coordinates=coordinates)
-        annotation.save()
+        annotation, created = Annotation.objects.get_or_create(
+            user=request.user,
+            image=image,
+            defaults={"coordinates": json.dumps(coordinates)},
+        )
+        if not created:
+            # if the annotation already exists, update the coordinates
+            annotation.coordinates = json.dumps(coordinates)
+            annotation.save()
         try:
             return redirect("retimgann:annotation_page", image_id=image_id + 1)
-        except:
+        except ObjectDoesNotExist:
             return redirect("retimgann:thank_you")
 
     # Should not reach here

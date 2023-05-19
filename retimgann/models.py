@@ -24,6 +24,9 @@ class Image(models.Model):
 class Annotation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ForeignKey(Image, on_delete=models.CASCADE)
-    coordinates = models.JSONField()
+    coordinates = models.JSONField(default=list)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
+
+    class Meta:
+        unique_together = [["user", "image"]]

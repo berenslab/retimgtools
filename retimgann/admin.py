@@ -20,6 +20,7 @@ class AnnotationAdmin(admin.ModelAdmin):
         "image",
         "coordinates",
         "created_at",
+        "updated_at",
     ]
     list_filter = [
         "user",
