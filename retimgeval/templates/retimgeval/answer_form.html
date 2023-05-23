@@ -4,11 +4,9 @@
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
 
-{% comment %} javascript code to record the time spent on filling out the form
-save it to the variable "reaction_time" and send it to the django model Answer()
-when submitting the form with POST {% endcomment %}
+
 <script>
-  {% comment %} reaction time {% endcomment %}
+  // reaction time
   var form = document.getElementsByTagName("form")[0];
   form.addEventListener("submit", function(event) {
       var reaction_time = new Date().getTime() - start;

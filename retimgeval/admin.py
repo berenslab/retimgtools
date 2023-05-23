@@ -7,7 +7,7 @@ from .models import Answer, Choice, Consent, Question, Task
 # Register your models here.
 @admin.register(Consent)
 class ConsentAdmin(admin.ModelAdmin):
-    list_display = ["user", "consented", "consented_at"]
+    list_display = ["user", "task", "consented", "consented_at"]
 
 
 class ChoiceInline(admin.TabularInline):
@@ -36,7 +36,13 @@ class AnswerAdmin(admin.ModelAdmin):
     actions = [csvexport]
 
 
-admin.site.register(Task)
+class TaskAdmin(admin.ModelAdmin):
+    list_display = ("description", "category", "is_active", "created_at")
+    list_filter = ("category", "is_active", "created_at")
+    search_fields = ("description", "category")
+
+
+admin.site.register(Task, TaskAdmin)
 admin.site.register(Question)
 admin.site.register(Choice, ChoiceAdmin)
 admin.site.register(Answer, AnswerAdmin)

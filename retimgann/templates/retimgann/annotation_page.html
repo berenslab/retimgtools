@@ -6,10 +6,10 @@
 
 {% if user.is_authenticated %}
 
-<h1>Annotate Image</h1>
+<h1>Lesion annotation for diabetic retinopathy (DR)</h1>
 
 <div class="row">
-    <h2>Annotating `{{ image.name }}` ({{ image.pk }}/ {{ total_num_images}})</h2>
+    <h4>Annotating image {{ image.pk }}/ {{ total_num_images}}</h4>
     <div class="col">
         <canvas id="imageCanvas" width="512" height="512" style="background-image: url({{ image.image.url }});"></canvas>
         <canvas id="magnifierCanvas" width="150" height="150" style="border:1px solid #d3d3d3"></canvas>
@@ -29,28 +29,28 @@
                     <input class="form-check-input" type="radio" name="label" id="labelMA" value="MA">
                     <label class="form-check-label" for="labelMA">
                         <span class="colorBox" style="background-color: red;"></span>
-                        <div style="color:red; float: left">&#9632;</div>MA
+                        <div style="color:red; float: left">&#9632;</div>microaneurysms (MA)
                     </label>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="label" id="labelHE" value="HE">
                     <label class="form-check-label" for="labelHE">
                         <span class="colorBox" style="background-color: blue;"></span>
-                        <div style="color:blue; float: left ">&#9632;</div>HE
+                        <div style="color:blue; float: left ">&#9632;</div>hemorraghes (HE)
                     </label>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="label" id="labelEX" value="EX">
                     <label class="form-check-label" for="labelEX">
                         <span class="colorBox" style="background-color: green;"></span>
-                        <div style="color:green; float:left ">&#9632;</div>EX
+                        <div style="color:green; float:left ">&#9632;</div>exudates (EX)
                     </label>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="label" id="labelSE" value="SE">
                     <label class="form-check-label" for="labelSE">
                         <span class="colorBox" style="background-color: yellow;"></span>
-                        <div style="color:yellow; float:left ">&#9632;</div>SE
+                        <div style="color:yellow; float:left ">&#9632;</div>soft exudates (SE)
                     </label>
                 </div>
 
@@ -58,7 +58,7 @@
                     <input class="form-check-input" type="radio" name="label" id="labelARTEFACT" value="ARTEFACT">
                     <label class="form-check-label" for="labelARTEFACT">
                         <span class="colorBox" style="background-color: purple;"></span>
-                        <div style="color:purple; float:left ">&#9632;</div>ARTEFACT
+                        <div style="color:purple; float:left ">&#9632;</div>artifact
                     </label>
                 </div>
 
@@ -67,13 +67,29 @@
                     <input class="form-check-input" type="radio" name="label" id="labelOTHER" value="OTHER">
                     <label class="form-check-label" for="labelOTHER">
                         <span class="colorBox" style="background-color: black;"></span>
-                        <div style="color:black; float: left">&#9632;</div>Other
+                        <div style="color:black; float: left">&#9632;</div>other legions
                     </label>
                     <input type="text" id="otherLabelInput" style="display: none;">
                 </div>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
+        <br/>
+        <div class="instruction">
+            <h6>Instruction</h6>
+            <p>
+                Your task is to annotate lesions related to Diabetic Retinopathy on fundus images. By moving the mouse over the image, you get a magnified cutout of the image in the small window below. All images are from patients with DR of grade 0 ("no DR"), grade 1 ("mild DR") and grade 2 ("moderate DR"). For best contrast, you may need to adjust the brightness of your monitor to maximal.
+            </p>
+            <p>
+                To mark a lesion, select the type of lesion on the right. You can annotate microaneurysms (MA), hemorraghes (HE), exudates (EX), soft exudates (SE), artefacts or other lesions. You add a lesion marker to the image by clicking on the image. You can also highlight or remove a lesion again by clikcing the respective button in the panel in the top right.
+            </p>
+            <p>
+                Make sure you work carefully and annotate all lesions that are present. When you are done with an image, click "submit". The annotations will be saved.                
+            </p>
+            <p>
+                If you need to interrupt a session, we will load the images and corresponding annotations that you have already submitted.               
+            </p>
+        </div>
     </div>
 </div>
 
@@ -108,7 +124,7 @@
     let coordinates = [];
     let lastHighlightedDot = null;
     let lastHighlightedDotImage = null; // Stores the image data before drawing highlight
-
+    let loadTime = Date.now(); // Store the time when the page was loaded
 
     document.querySelectorAll('input[name="label"]').forEach((radio) => {
         radio.addEventListener('change', (event) => {
@@ -222,26 +238,30 @@
     });
 
     form.addEventListener('submit', (event) => {
-        // Check if coordinates array is empty
-        {% comment %} if (coordinates.length === 0) {
-            alert('No coordinates have been logged. Please annotate the image before submitting.');
-            event.preventDefault();
-            return;
-        } {% endcomment %}
     
         event.preventDefault();
 
+        let existingTimeSpent = {{ existing_time_spent }};
+        let timeSpent = Date.now() - loadTime + existingTimeSpent;
         // Create a new array that only contains the required properties for each coordinate
         let coordinatesToSubmit = coordinates.map(coordinate => {
             return {label: coordinate.label, x: coordinate.x, y: coordinate.y, color: coordinate.color};
         });
 
         // Add coordinates to form
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'coordinates';
-        input.value = JSON.stringify(coordinatesToSubmit);
-        form.appendChild(input);
+        const coordinatesInput = document.createElement('input');
+        coordinatesInput.type = 'hidden';
+        coordinatesInput.name = 'coordinates';
+        coordinatesInput.value = JSON.stringify(coordinatesToSubmit);
+        form.appendChild(coordinatesInput);
+
+        // Add time spent to form
+        const timeInput = document.createElement('input');
+        timeInput.type = 'hidden';
+        timeInput.name = 'time_spent';
+        timeInput.value = timeSpent;
+        form.appendChild(timeInput);
+        
         // Submit the form
         form.submit();
     });
@@ -505,6 +525,19 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+
+    .instruction {
+        color: gray;
+        font-size: small;
+    }
+
+    .instruction h6 {
+        font-weight: bold;
+    }
+
+    .instruction p {
+        margin-top: 10px;
     }
 </style>
 

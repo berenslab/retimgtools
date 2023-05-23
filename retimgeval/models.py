@@ -5,16 +5,10 @@ from django.urls import reverse
 User = get_user_model()
 
 
-class Consent(models.Model):
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="retimgeval_consent"
-    )
-    consented = models.BooleanField(default=False)
-    consented_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-
-
 class Task(models.Model):
     description = models.TextField()
+    category = models.CharField(max_length=200)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -68,3 +62,12 @@ class Answer(models.Model):
             "question:question_detail",
             kwargs={"slug": f"t{self.task.pk}q{self.question.pk}p1"},
         )
+
+
+class Consent(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="retimgeval_consent"
+    )
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    consented = models.BooleanField(default=False)
+    consented_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)

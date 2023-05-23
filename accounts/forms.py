@@ -55,9 +55,10 @@ class CustomUserCreationForm(UserCreationForm):
             invitation = InvitationCode.objects.get(code=code)
             invitation.is_used = True
             invitation.save()
-            user.save()
+            user.code_used = invitation.code
         else:
             user.is_staff = True
+            user.code_used = "passcode"
 
         if commit:
             user.save()

@@ -7,33 +7,36 @@ from .forms import AnswerForm, ConsentForm
 from .models import Answer, Choice, Consent, Question, Task
 
 
-class LandingPageView(CreateView):
-    model = Consent
-    form_class = ConsentForm
-    template_name = "retimgeval/landing_page.html"
-
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            # Check if user has already given consent
-            user_consent = Consent.objects.filter(
-                user=request.user, consented=True
-            ).first()
-            if user_consent:
-                # If user has given consent, redirect to the annotation page
-                return redirect("retimgeval:task_list")
-        return super().get(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        form.save()
-        return redirect("retimgeval:task_list")
-
-
-class TaskInstructionView(View):
+class TaskInstructionView(CreateView):
     def get(self, request, pk):
         task = Task.objects.get(pk=pk)
-        context = {"task": task}
+        # Check if a Consent record already exists
+        already_consented = False
+        try:
+            consent = Consent.objects.get(user=request.user, task=task)
+            if consent.consented:
+                already_consented = True
+        except Consent.DoesNotExist:
+            pass
+
+        form = ConsentForm()
+        context = {"task": task, "form": form, "already_consented": already_consented}
         return render(request, "retimgeval/task_instruction.html", context)
+
+    def post(self, request, pk):
+        form = ConsentForm(request.POST)
+        if form.is_valid() and form.cleaned_data.get("consented") is True:
+            consent, _ = Consent.objects.update_or_create(
+                user=request.user,
+                task_id=pk,
+                defaults={"consented": form.cleaned_data.get("consented")},
+            )
+            consent.save()
+            return redirect("retimgeval:question_detail", slug=f"t{pk}q1p1")
+        else:
+            task = Task.objects.get(pk=pk)
+            context = {"task": task, "form": form}
+            return render(request, "retimgeval/task_instruction.html", context)
 
 
 # Create your views here.
@@ -117,7 +120,11 @@ def question_detail(request, slug):
 class ThankYouPageView(View):
     def get(self, request, pk):
         task = Task.objects.get(pk=pk)
-        next_task = Task.objects.filter(pk__gt=task.pk).order_by("pk").first()
+        next_task = (
+            Task.objects.filter(category=task.category, pk__gt=task.pk)
+            .order_by("pk")
+            .first()
+        )
 
         if next_task:
             next_link = reverse(

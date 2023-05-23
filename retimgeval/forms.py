@@ -11,6 +11,7 @@ class ConsentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ConsentForm, self).__init__(*args, **kwargs)
         self.fields["consented"].required = True
+        self.fields["consented"].label = "Consent"
 
 
 class AnswerForm(forms.ModelForm):

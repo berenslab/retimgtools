@@ -19,6 +19,7 @@ class AnnotationAdmin(admin.ModelAdmin):
         "user",
         "image",
         "coordinates",
+        "time_spent",
         "created_at",
         "updated_at",
     ]

@@ -2,15 +2,40 @@
 
 {% block content %}
 
-
-
-<h1>All Tasks</h1>
 {% if user.is_authenticated %}
+
+
+<h2>Decision support through AI-generated images</h2>
+<ul>
 {% for task in tasks %}
-<h2>
+{% if task.category == "realism" %}
+<li>
+    {% if task.is_active %}
     <a href="{% url 'retimgeval:task_instruction' task.pk %}">{{ task.description }}</a>
-</h2>
+    {% else %}
+    <span>{{ task.description }} (inactive)</span>
+    {% endif %}
+</li>
+{% endif %}
 {% endfor %}
+</ul>
+
+<h2>Decision support through sparse BagNets</h2>
+<ul>
+{% for task in tasks %}
+{% if task.category == "bagnet" %}
+<li>
+    {% if task.is_active %}
+    <a href="{% url 'retimgeval:task_instruction' task.pk %}">{{ task.description }}</a>
+    {% else %}
+    <span>{{ task.description }}</span>
+    {% endif %}
+</li>
+{% endif %}
+{% endfor %}
+</ul>
+
+
 {% else %}
     <p>You are not logged in</p>
 {% endif %} 

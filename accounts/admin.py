@@ -13,7 +13,7 @@ class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = CustomUser
-    list_display = ["username", "experience", "is_staff"]
+    list_display = ["username", "experience", "is_staff", "date_joined", "code_used"]
 
 
 @admin.register(InvitationCode)

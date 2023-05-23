@@ -45,33 +45,43 @@ def annotate(request, image_id):
         if request.method == "POST":
             # Annotation form submitted
             coordinates = json.loads(request.POST.get("coordinates"))
+            time_spent = request.POST.get(
+                "time_spent"
+            )  # get the time_spent value from the form
             annotation, created = Annotation.objects.get_or_create(
                 user=request.user,
                 image=image,
-                defaults={"coordinates": json.dumps(coordinates)},
+                defaults={
+                    "coordinates": json.dumps(coordinates),
+                    "time_spent": time_spent,
+                },
             )
             if not created:
                 # if the annotation already exists, update the coordinates
                 annotation.coordinates = json.dumps(coordinates)
+                annotation.time_spent = time_spent  # update time_spent
                 annotation.save()
             return redirect("retimgann:annotation_page", image_id=image_id + 1)
     except ObjectDoesNotExist:
         return redirect("retimgann:thank_you")
 
-    existing_annotation = Annotation.objects.filter(
-        user=request.user, image=image
-    ).first()
+    annotation = Annotation.objects.filter(user=request.user, image=image).first()
+
+    if annotation:
+        existing_annotation = mark_safe(json.dumps(json.loads(annotation.coordinates)))
+        existing_time_spent = annotation.time_spent
+    else:
+        existing_annotation = []
+        existing_time_spent = 0
+
     return render(
         request,
         "retimgann/annotation_page.html",
         {
             "image": image,
             "total_num_images": total_num_images,
-            "existing_annotation": mark_safe(
-                json.dumps(json.loads(existing_annotation.coordinates))
-            )
-            if existing_annotation
-            else [],
+            "existing_annotation": existing_annotation,
+            "existing_time_spent": existing_time_spent,
         },
     )
 
@@ -80,16 +90,23 @@ def annotate_submit(request):
     if request.method == "POST":
         # Annotation form submitted
         coordinates = json.loads(request.POST.get("coordinates"))
+        time_spent = request.POST.get(
+            "time_spent"
+        )  # get the time_spent value from the form
         image_id = request.POST.get("image_id")
         image = Image.objects.get(id=image_id)
         annotation, created = Annotation.objects.get_or_create(
             user=request.user,
             image=image,
-            defaults={"coordinates": json.dumps(coordinates)},
+            defaults={
+                "coordinates": json.dumps(coordinates),
+                "time_spent": time_spent,
+            },  # include time_spent in the defaults
         )
         if not created:
-            # if the annotation already exists, update the coordinates
+            # if the annotation already exists, update the coordinates and time_spent
             annotation.coordinates = json.dumps(coordinates)
+            annotation.time_spent = time_spent  # update time_spent
             annotation.save()
         try:
             return redirect("retimgann:annotation_page", image_id=image_id + 1)

@@ -6,7 +6,6 @@ from . import views
 
 app_name = "retimgeval"
 urlpatterns = [
-    path("", views.LandingPageView.as_view(), name="landing_page"),
     path("tasks", views.task_list, name="task_list"),
     path(
         "tasks/<int:pk>/instruction/",
