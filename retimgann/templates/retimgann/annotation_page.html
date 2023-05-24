@@ -28,37 +28,32 @@
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="label" id="labelMA" value="MA">
                     <label class="form-check-label" for="labelMA">
-                        <span class="colorBox" style="background-color: red;"></span>
-                        <div style="color:red; float: left">&#9632;</div>microaneurysms (MA)
+                        <div style="color:red; float: left">&#9632;</div>&nbsp;Microaneurysms (MA)
                     </label>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="label" id="labelHE" value="HE">
                     <label class="form-check-label" for="labelHE">
-                        <span class="colorBox" style="background-color: blue;"></span>
-                        <div style="color:blue; float: left ">&#9632;</div>hemorraghes (HE)
+                        <div style="color:blue; float: left ">&#9632;</div>&nbsp;Hemorraghes (HE)
                     </label>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="label" id="labelEX" value="EX">
                     <label class="form-check-label" for="labelEX">
-                        <span class="colorBox" style="background-color: green;"></span>
-                        <div style="color:green; float:left ">&#9632;</div>exudates (EX)
+                        <div style="color:green; float:left ">&#9632;</div>&nbsp;Exudates (EX)
                     </label>
                 </div>
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="label" id="labelSE" value="SE">
                     <label class="form-check-label" for="labelSE">
-                        <span class="colorBox" style="background-color: yellow;"></span>
-                        <div style="color:yellow; float:left ">&#9632;</div>soft exudates (SE)
+                        <div style="color:yellow; float:left ">&#9632;</div>&nbsp;Soft Exudates (SE)
                     </label>
                 </div>
 
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="label" id="labelARTEFACT" value="ARTEFACT">
                     <label class="form-check-label" for="labelARTEFACT">
-                        <span class="colorBox" style="background-color: purple;"></span>
-                        <div style="color:purple; float:left ">&#9632;</div>artifact
+                        <div style="color:purple; float:left ">&#9632;</div>&nbsp;Artifact
                     </label>
                 </div>
 
@@ -66,8 +61,7 @@
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="label" id="labelOTHER" value="OTHER">
                     <label class="form-check-label" for="labelOTHER">
-                        <span class="colorBox" style="background-color: black;"></span>
-                        <div style="color:black; float: left">&#9632;</div>other legions
+                        <div style="color:black; float: left">&#9632;</div>&nbsp;Others
                     </label>
                     <input type="text" id="otherLabelInput" style="display: none;">
                 </div>
@@ -311,7 +305,7 @@
         );
 
         magnifierCtx.beginPath();
-        magnifierCtx.arc(magnifierSize / 2, magnifierSize / 2, 5, 0, 2 * Math.PI); // x, y, radius, startAngle, endAngle
+        magnifierCtx.arc(magnifierSize / 2, magnifierSize / 2, 10, 0, 2 * Math.PI); // x, y, radius, startAngle, endAngle
         magnifierCtx.stroke();
     }
 
@@ -404,7 +398,7 @@
                 ctx.drawImage(img, 0, 0, 512, 512);
             };
             img.src = '{{ image.image.url }}';
-    
+
             // Reset highlighted dot
             lastHighlightedDot = null;
             lastHighlightedDotImage = null;

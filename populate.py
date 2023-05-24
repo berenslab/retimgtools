@@ -61,7 +61,7 @@ for img_set in range(1, num_img_set_t1 + 1):
         image2=f"evaluate/Task1/{img_set}b.png",
         image3=f"evaluate/Task1/{img_set}c.png",
         created_at=timezone.now(),
-        slug=f"{t1alias}-q{img_set}p1",
+        slug=f"{t1alias}-q{img_set}",
     )
     for choice in ["a", "b", "c"]:
         q.choice_set.create(
@@ -99,7 +99,7 @@ for img in range(1, num_img_set_t2c1 + 1):
         description=f"Q{img}/{num_img_set_t2c1} [2/2]: How confident are you of the assigned grade?",
         created_at=timezone.now(),
         image1=f"evaluate/Task2/cond1/{img}.png",
-        slug=f"t2q{img}p2",
+        slug=f"{t2alias}-q{img}p2",
     )
 
     for choice in range(1, 11):
@@ -120,7 +120,7 @@ all_image_t2c2 = sorted(glob.glob("media/evaluate/Task2/cond2/*.png"))
 num_img_set_t2c2 = len(set([img[:-5] for img in all_image_t2c2]))
 for img in range(1, num_img_set_t2c2 + 1):
     q1 = t3.question_set.create(
-        description=f"Q{img}/{num_img_set_t2c2} [1/2]: Question: Diabetic Retinopathy referral",
+        description=f"Q{img}/{num_img_set_t2c2} [1/2]: Diabetic Retinopathy referral",
         created_at=timezone.now(),
         image1=f"evaluate/Task2/cond2/{img}a.png",
         image2=f"evaluate/Task2/cond2/{img}b.png",
