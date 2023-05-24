@@ -38,7 +38,7 @@ class AnswerAdmin(admin.ModelAdmin):
 
 
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ("description", "category", "is_active", "created_at")
+    list_display = ("category", "alias", "description", "is_active", "created_at")
     list_filter = ("category", "is_active", "created_at")
     search_fields = ("description", "category")
 

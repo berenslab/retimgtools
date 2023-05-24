@@ -11,7 +11,7 @@ class ConsentAdmin(admin.ModelAdmin):
 
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
-    list_display = ["id", "image", "name"]
+    list_display = ["index", "image", "name"]
 
 
 class AnnotationAdmin(admin.ModelAdmin):

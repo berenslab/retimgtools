@@ -353,7 +353,7 @@
     
     
     function deleteCoordinate(coordinate, coordinateElement) {
-        let index = coordinates.indexOf(coordinate);
+        let index = coordinates.findIndex(c => c.x === coordinate.x && c.y === coordinate.y);
         if (index > -1) {
             coordinates.splice(index, 1);
         }
@@ -369,6 +369,10 @@
                 ctx.arc(coordinate.x, coordinate.y, 2, 0, 2 * Math.PI);
                 ctx.fillStyle = coordinate.color;
                 ctx.fill();
+            }
+            // Update lastHighlightedDotImage
+            if (lastHighlightedDot) {
+                lastHighlightedDotImage = ctx.getImageData(lastHighlightedDot.x - 5, lastHighlightedDot.y - 5, 10, 10);
             }
         };
         img.src = '{{ image.image.url }}';
