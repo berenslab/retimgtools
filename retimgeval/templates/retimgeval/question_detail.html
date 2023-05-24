@@ -54,24 +54,52 @@
     </tr>
 </table>
 
-{% include "retimgeval/answer_form.html" %}
+<h2>Answer</h2>
+<form action="{{ question.get_absolute_url}}" method="POST">
+  {{ form.as_p }} {% csrf_token %}
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
 
-{% if question.task.id == 1%}
-<script type="text/javascript">
-    setTimeout(function() {
-        var canvases = document.getElementsByTagName('canvas');
-        for (var i = 0; i < canvases.length; i++) {
-            var ctx = canvases[i].getContext('2d');
-            ctx.clearRect(0, 0, canvases[i].width, canvases[i].height);
-
-            canvases[i].style.border = '2px solid black';
-        }
-    }, 20000);
-</script>
-
-{% endif %}
 
 <script>
+
+    const form = document.querySelector("form");
+
+    // for task 1 only  
+    {% if question.task.id == 1 %}
+      const delayTimes = [5000, 10000, 20000];  // Delay times in milliseconds
+      const delayTime = delayTimes[Math.floor(Math.random() * delayTimes.length)];  // Select random delay time
+  
+      const delayInput = document.createElement("input");
+      delayInput.type = "hidden";
+      delayInput.name = "delay_time";
+      delayInput.value = delayTime;
+      form.appendChild(delayInput);
+  
+      setTimeout(() => {
+          const canvases = document.querySelectorAll('canvas');
+          canvases.forEach((canvas) => {
+              const ctx = canvas.getContext('2d');
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              canvas.style.border = '2px solid black';
+          });
+      }, delayTime);
+    {% endif %}
+  
+
+    // reaction time
+    let start = new Date().getTime();
+    form.addEventListener("submit", (event) => {
+        const reaction_time = new Date().getTime() - start;
+        console.log(reaction_time);
+        const reactiontimeInput = document.createElement("input");
+        reactiontimeInput.type = 'hidden';
+        reactiontimeInput.name = 'reaction_time';
+        reactiontimeInput.value = reaction_time;
+        form.appendChild(reactiontimeInput);
+    });
+
+    // for all tasks
     const imageCanvases = document.querySelectorAll('.imageCanvas');
     const magnifierCanvases = document.querySelectorAll('.magnifierCanvas');
     const magnifierSize = 150;
@@ -142,38 +170,37 @@
             drawMagnifier(x, y, imageCanvas, magnifierCanvases[index]);
         });
     };
-
-    for (let i = 0; i < imageCanvases.length; i++) {
-        const imageCanvas = imageCanvases[i];
+  
+    imageCanvases.forEach((imageCanvas) => {
         const imageCtx = imageCanvas.getContext('2d');
         const img = new Image();
-
+  
         img.onload = function() {
             imageCtx.drawImage(img, 0, 0, imageCanvas.width, imageCanvas.height);
-
+  
             {% if question.task.id != 1 %}
-            imageCanvas.addEventListener('mouseenter', function(event) {
+            imageCanvas.addEventListener('mouseenter', (event) => {
                 const rect = imageCanvas.getBoundingClientRect();
                 const x = event.clientX - rect.left;
                 const y = event.clientY - rect.top;
                 updateMagnifiers(x, y, imageCanvas);
             });
-
-            imageCanvas.addEventListener('mousemove', function(event) {
+  
+            imageCanvas.addEventListener('mousemove', (event) => {
                 const rect = imageCanvas.getBoundingClientRect();
                 const x = event.clientX - rect.left;
                 const y = event.clientY - rect.top;
                 updateMagnifiers(x, y, imageCanvas);
             });
-    
-            imageCanvas.addEventListener('mouseleave', function() {
+  
+            imageCanvas.addEventListener('mouseleave', () => {
                 clearMagnifiers();
             });
             {% endif %}
         };
     
-        img.src = imageCanvas.getAttribute('data-src');
-        }
+        img.src = imageCanvas.dataset.src;
+    });
 </script>
 
 {% else %}

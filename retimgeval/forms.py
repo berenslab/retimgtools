@@ -23,3 +23,4 @@ class AnswerForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["choice"].widget = forms.RadioSelect()
         self.fields["choice"].empty_label = None
+        self.fields["choice"].label = ""

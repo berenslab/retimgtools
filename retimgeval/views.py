@@ -86,6 +86,7 @@ def question_detail(request, slug):
         if form.is_valid():
             option = form.save(commit=False)
             option.reaction_time = request.POST.get("reaction_time", None)
+            option.delay_time = request.POST.get("delay_time", None)
             option.task = task
             option.question = question
             option.user = request.user
@@ -110,8 +111,8 @@ def question_detail(request, slug):
         "question": question,
         "choices": choices,
         "form": form,
-        # read ajax response
         "reaction_time": request.GET.get("reaction_time", None),
+        "delay_time": request.GET.get("delay_time", None),
     }
 
     return render(request, "retimgeval/question_detail.html", context)

@@ -29,6 +29,7 @@ class AnswerAdmin(admin.ModelAdmin):
         "question",
         "answered_at",
         "reaction_time",
+        "delay_time",
     )
     list_filter = ("user", "answered_at")
     search_fields = ("choice", "user")
