@@ -11,6 +11,7 @@ class Task(models.Model):
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    alias = models.CharField(max_length=200, blank=True, null=True)
 
     def __str__(self):
         return self.description
@@ -18,7 +19,7 @@ class Task(models.Model):
     def get_absolute_url(self, *args, **kwargs):
         return reverse(
             "retimgeval:question_detail",
-            kwargs={"slug": f"t{self.pk}q1p1"},
+            kwargs={"slug": f"{self.alias}-q1p1"},
         )
 
 

@@ -24,9 +24,7 @@ class LandingPageView(CreateView):
             ).first()
             if user_consent:
                 # If user has given consent, redirect to the annotation page
-                return redirect(
-                    "retimgann:annotation_page", image_id=str(Image.objects.first().pk)
-                )
+                return redirect("retimgann:annotation_page", image_id=1)
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -39,7 +37,7 @@ class LandingPageView(CreateView):
 
 def annotate(request, image_id):
     try:
-        image = Image.objects.get(id=image_id)
+        image = Image.objects.get(index=image_id)
         total_num_images = Image.objects.count()
 
         if request.method == "POST":

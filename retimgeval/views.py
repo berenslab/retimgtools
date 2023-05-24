@@ -8,8 +8,8 @@ from .models import Answer, Choice, Consent, Question, Task
 
 
 class TaskInstructionView(CreateView):
-    def get(self, request, pk):
-        task = Task.objects.get(pk=pk)
+    def get(self, request, alias):
+        task = Task.objects.get(alias=alias)
         # Check if a Consent record already exists
         already_consented = False
         try:
@@ -23,18 +23,18 @@ class TaskInstructionView(CreateView):
         context = {"task": task, "form": form, "already_consented": already_consented}
         return render(request, "retimgeval/task_instruction.html", context)
 
-    def post(self, request, pk):
+    def post(self, request, alias):
         form = ConsentForm(request.POST)
+        task = Task.objects.get(alias=alias)
         if form.is_valid() and form.cleaned_data.get("consented") is True:
             consent, _ = Consent.objects.update_or_create(
                 user=request.user,
-                task_id=pk,
+                task=task,
                 defaults={"consented": form.cleaned_data.get("consented")},
             )
             consent.save()
-            return redirect("retimgeval:question_detail", slug=f"t{pk}q1p1")
+            return redirect("retimgeval:question_detail", slug=f"{alias}-q1p1")
         else:
-            task = Task.objects.get(pk=pk)
             context = {"task": task, "form": form}
             return render(request, "retimgeval/task_instruction.html", context)
 
@@ -72,7 +72,7 @@ def question_detail(request, slug):
             return redirect("retimgeval:question_detail", slug=next_question.slug)
         else:
             # This was the last question in this task
-            return redirect("retimgeval:thank_you", pk=task.pk)
+            return redirect("retimgeval:thank_you", alias=task.alias)
 
     choices = question.choice_set.all()
 
@@ -98,7 +98,7 @@ def question_detail(request, slug):
                 return redirect("retimgeval:question_detail", slug=next_question.slug)
             else:
                 # This was the last question in this task
-                return redirect("retimgeval:thank_you", pk=task.pk)
+                return redirect("retimgeval:thank_you", alias=task.alias)
 
     else:
         form = AnswerForm()
@@ -119,17 +119,17 @@ def question_detail(request, slug):
 
 
 class ThankYouPageView(View):
-    def get(self, request, pk):
-        task = Task.objects.get(pk=pk)
+    def get(self, request, alias):
+        task = Task.objects.get(alias=alias)
         next_task = (
-            Task.objects.filter(category=task.category, pk__gt=task.pk)
-            .order_by("pk")
+            Task.objects.filter(category=task.category, alias__gt=task.alias)
+            .order_by("alias")
             .first()
         )
 
         if next_task:
             next_link = reverse(
-                "retimgeval:task_instruction", kwargs={"pk": next_task.pk}
+                "retimgeval:task_instruction", kwargs={"alias": next_task.alias}
             )
         else:
             next_link = None

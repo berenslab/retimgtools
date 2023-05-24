@@ -14,7 +14,7 @@
     {% if task.category == "realism" %}
       <li class="list-group-item">
         {% if task.is_active %}
-          <a href="{% url 'retimgeval:task_instruction' task.pk %}" class="text-decoration-none">{{ task.description }}</a> (active)
+          <a href="{% url 'retimgeval:task_instruction' task.alias %}" class="text-decoration-none">{{ task.description }}</a> (active)
         {% else %}
           <span>{{ task.description }} (inactive)</span>
         {% endif %}

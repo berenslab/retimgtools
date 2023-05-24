@@ -15,7 +15,7 @@ class Consent(models.Model):
 class Image(models.Model):
     image = models.ImageField(upload_to="annotate/")
     name = models.CharField(max_length=100, blank=True)
-    # description = models.TextField(blank=True)
+    index = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.name

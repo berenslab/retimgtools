@@ -32,17 +32,23 @@ except:
 
 all_images = sorted(glob.glob("media/annotate/*.png"))
 
-for image in all_images:
-    img = Image(image=image[6:], name=image.split("/")[-1].split(".")[0])
+for index, image in enumerate(all_images):
+    img = Image(
+        image=image[6:],
+        name=image.split("/")[-1].split(".")[0],
+        index=index + 1,
+    )
     img.save()
 
 # Retinal Image Evaluation
 
 # task 1
+t1alias = "realism"
 t1 = Task(
     description="Realism of AI-generated fundus images",
     category="realism",
     is_active=True,
+    alias=t1alias,
 )
 t1.save()
 
@@ -55,7 +61,7 @@ for img_set in range(1, num_img_set_t1 + 1):
         image2=f"evaluate/Task1/{img_set}b.png",
         image3=f"evaluate/Task1/{img_set}c.png",
         created_at=timezone.now(),
-        slug=f"t1q{img_set}p1",
+        slug=f"{t1alias}-q{img_set}p1",
     )
     for choice in ["a", "b", "c"]:
         q.choice_set.create(
@@ -64,10 +70,12 @@ for img_set in range(1, num_img_set_t1 + 1):
         )
 
 # task 2
+t2alias = "realism-grading-no-support"
 t2 = Task(
     description="Grading of DR without decision suppor",
     category="realism",
     is_active=True,
+    alias=t2alias,
 )
 t2.save()
 
@@ -78,7 +86,7 @@ for img in range(1, num_img_set_t2c1 + 1):
         description=f"Q{img}/{num_img_set_t2c1} [1/2]: Diabetic Retinopathy referral",
         image1=f"evaluate/Task2/cond1/{img}.png",
         created_at=timezone.now(),
-        slug=f"t2q{img}p1",
+        slug=f"{t2alias}-q{img}p1",
     )
 
     for choice in ["No DR", "Referable DR"]:
@@ -99,11 +107,12 @@ for img in range(1, num_img_set_t2c1 + 1):
             choice_text=f"{choice}",
         )
 
-
+t3alias = "realism-grading-with-support"
 t3 = Task(
     description="Grading of DR with decision support",
     category="realism",
     is_active=True,
+    alias=t3alias,
 )
 t3.save()
 
@@ -116,7 +125,7 @@ for img in range(1, num_img_set_t2c2 + 1):
         image1=f"evaluate/Task2/cond2/{img}a.png",
         image2=f"evaluate/Task2/cond2/{img}b.png",
         image3=f"evaluate/Task2/cond2/{img}c.png",
-        slug=f"t3q{img}p1",
+        slug=f"{t3alias}-q{img}p1",
     )
 
     for choice in ["No DR", "Referable DR"]:
@@ -130,7 +139,7 @@ for img in range(1, num_img_set_t2c2 + 1):
         image1=f"evaluate/Task2/cond2/{img}a.png",
         image2=f"evaluate/Task2/cond2/{img}b.png",
         image3=f"evaluate/Task2/cond2/{img}c.png",
-        slug=f"t3q{img}p2",
+        slug=f"{t3alias}-q{img}p2",
     )
 
     for choice in range(1, 11):
@@ -140,17 +149,21 @@ for img in range(1, num_img_set_t2c2 + 1):
 
 
 # task 4
+t4alias = "bagnet-grading-no-support"
 t4 = Task(
     description="Grading of DR without decision support",
     category="bagnet",
     is_active=False,
+    alias=t4alias,
 )
 t4.save()
 
 # task 5
+t5alias = "bagnet-grading-with-support"
 t5 = Task(
     description="Grading of DR with decision support",
     category="bagnet",
     is_active=False,
+    alias=t5alias,
 )
 t5.save()

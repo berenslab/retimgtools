@@ -8,7 +8,7 @@ app_name = "retimgeval"
 urlpatterns = [
     path("tasks", views.task_list, name="task_list"),
     path(
-        "tasks/<int:pk>/instruction/",
+        "tasks/<str:alias>/instruction/",
         views.TaskInstructionView.as_view(),
         name="task_instruction",
     ),
@@ -17,5 +17,7 @@ urlpatterns = [
         views.question_detail,
         name="question_detail",
     ),
-    path("tasks/<int:pk>/thanks/", views.ThankYouPageView.as_view(), name="thank_you"),
+    path(
+        "tasks/<str:alias>/thanks/", views.ThankYouPageView.as_view(), name="thank_you"
+    ),
 ]

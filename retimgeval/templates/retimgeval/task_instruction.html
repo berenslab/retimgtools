@@ -6,7 +6,7 @@
 
 {% if user.is_authenticated %}
 
-    {% if task.pk == 1 %}
+    {% if task.alias == "realism" %}
     <h1>Realism of AI-generated fundus images</h1>
     <h3>Instruction</h3>
     <ul>
@@ -25,7 +25,7 @@
     </ul>
     {% endif %}
 
-    {% if task.pk == 2 %}
+    {% if task.alias == "realism-grading-no-support" %}
     <h1>Grading of DR without decision support</h1>
     <h3>Instruction</h3>
     <ul>
@@ -47,7 +47,7 @@
     </ul>
     {% endif %}
 
-    {% if task.pk == 3 %}
+    {% if task.alias == "realism-grading-with-support" %}
     <h1>Grading of DR with decision support</h1>
     <h3>Instruction</h3>
     <ul>

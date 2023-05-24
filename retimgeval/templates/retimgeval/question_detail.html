@@ -8,7 +8,7 @@
 <h1>{{ question.description }}</h1>
 
 <table>
-    {% if question.task.id == 1%}
+    {% if question.task.alias == "realism"%}
     <tr>
         {% if question.image1 %}<th>a</th>{% endif %}
         {% if question.image2 %}<th>b</th>{% endif %}
@@ -36,19 +36,19 @@
         {% if question.image1 %}
         <td>
             <canvas class="imageCanvas" width="450" height="450" data-src="{{ question.image1.url }}"></canvas>
-            <canvas class="magnifierCanvas" width="150" height="150" style="{% if question.task.id == 1 %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+            <canvas class="magnifierCanvas" width="150" height="150" style="{% if question.task.alias == "realism" %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
         </td>
         {% endif %}
         {% if question.image2 %}
             <td>
                 <canvas class="imageCanvas" width="450" height="450" data-src="{{ question.image2.url }}"></canvas>
-                <canvas class="magnifierCanvas" width="150" height="150" style="{% if question.task.id == 1 %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+                <canvas class="magnifierCanvas" width="150" height="150" style="{% if question.task.alias == "realism" %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
             </td>
         {% endif %}
         {% if question.image3 %}
             <td>
                 <canvas class="imageCanvas" width="450" height="450" data-src="{{ question.image3.url }}"></canvas>
-                <canvas class="magnifierCanvas" width="150" height="150" style="{% if question.task.id == 1 %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+                <canvas class="magnifierCanvas" width="150" height="150" style="{% if question.task.alias == "realism" %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
             </td>
         {% endif %}
     </tr>
@@ -66,7 +66,7 @@
     const form = document.querySelector("form");
 
     // for task 1 only  
-    {% if question.task.id == 1 %}
+    {% if question.task.alias == "realism" %}
       const delayTimes = [5000, 10000, 20000];  // Delay times in milliseconds
       const delayTime = delayTimes[Math.floor(Math.random() * delayTimes.length)];  // Select random delay time
   
