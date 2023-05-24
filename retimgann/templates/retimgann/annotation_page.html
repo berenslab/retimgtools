@@ -107,24 +107,22 @@
     const ctx = canvas.getContext('2d');
     const form = document.getElementById('annotationForm');
     const coordinatesContainer = document.getElementById('print_coordinates');
-    
+    const magnifierCanvas = document.getElementById('magnifierCanvas');
+    const magnifierCtx = magnifierCanvas.getContext('2d');
+    const magnifierSize = 150;
+    const zoomLevel = 2;
+    let selectedLabel = null;
+    let coordinates = [];
+    let lastHighlightedDot = null;
+    let lastHighlightedDotImage = null; // Stores the image data before drawing highlight
+    let loadTime = Date.now(); // Store the time when the page was loaded
+
     let img = new Image();
     img.src = '{{ image.image.url }}';
     img.onload = function() {
         ctx.drawImage(img, 0, 0, 512, 512);
         loadExistingCoordinates();
     };
-
-    const magnifierCanvas = document.getElementById('magnifierCanvas');
-    const magnifierCtx = magnifierCanvas.getContext('2d');
-    const magnifierSize = 150;
-    const zoomLevel = 2;
-
-    let selectedLabel = null;
-    let coordinates = [];
-    let lastHighlightedDot = null;
-    let lastHighlightedDotImage = null; // Stores the image data before drawing highlight
-    let loadTime = Date.now(); // Store the time when the page was loaded
 
     document.querySelectorAll('input[name="label"]').forEach((radio) => {
         radio.addEventListener('change', (event) => {
