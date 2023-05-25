@@ -30,9 +30,7 @@ class LandingPageView(CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         form.save()
-        return redirect(
-            "retimgann:annotation_page", image_id=str(Image.objects.first().pk)
-        )
+        return redirect("retimgann:annotation_page", image_id=1)
 
 
 def annotate(request, image_id):
@@ -92,7 +90,7 @@ def annotate_submit(request):
             "time_spent"
         )  # get the time_spent value from the form
         image_id = request.POST.get("image_id")
-        image = Image.objects.get(id=image_id)
+        image = Image.objects.get(index=image_id)
         annotation, created = Annotation.objects.get_or_create(
             user=request.user,
             image=image,
