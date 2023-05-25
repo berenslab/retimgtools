@@ -75,7 +75,7 @@
                 Your task is to annotate lesions related to Diabetic Retinopathy on fundus images. By moving the mouse over the image, you get a magnified cutout of the image in the small window below. All images are from patients with DR of grade 0 ("no DR"), grade 1 ("mild DR") and grade 2 ("moderate DR"). For best contrast, you may need to adjust the brightness of your monitor to maximal.
             </p>
             <p>
-                To mark a lesion, select the type of lesion on the right. You can annotate microaneurysms (MA), hemorraghes (HE), exudates (EX), soft exudates (SE), artefacts or other lesions. You add a lesion marker to the image by clicking on the image. You can also highlight or remove a lesion again by clikcing the respective button in the panel in the top right.
+                To mark a lesion, select the type of lesion on the right. You can annotate microaneurysms (MA), hemorraghes (HE), exudates (EX), soft exudates (SE), artefacts or other lesions. You add a lesion marker to the image by clicking on the image. You can also highlight or remove a lesion again by clicking the respective button in the panel in the top right.
             </p>
             <p>
                 Make sure you work carefully and annotate all lesions that are present. When you are done with an image, click "submit". The annotations will be saved.                
@@ -310,26 +310,33 @@
     }
 
     function showCoordinate(coordinate) {
-        if (lastHighlightedDot) {
-            // Restore the image data from before the last highlighted dot was drawn
-            ctx.putImageData(lastHighlightedDotImage, lastHighlightedDot.x - 10, lastHighlightedDot.y - 10);
-        }
-    
-        // Store the image data from before the new dot highlight is drawn
-        lastHighlightedDotImage = ctx.getImageData(coordinate.x - 10, coordinate.y - 10, 20, 20);
-    
+        // Clear the canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Redraw the image
+        ctx.drawImage(img, 0, 0, 512, 512);
+        
+        // Redraw all the dots
+        coordinates.forEach(c => {
+            ctx.beginPath();
+            ctx.arc(c.x, c.y, 5, 0, 2 * Math.PI);
+            ctx.fillStyle = c.color;
+            ctx.fill();
+        });
+        
         // Highlight the current dot
         ctx.beginPath();
         ctx.arc(coordinate.x, coordinate.y, 5, 0, 2 * Math.PI);
         ctx.strokeStyle = 'gray';
         ctx.lineWidth = 3;
         ctx.stroke();
-    
+        
         lastHighlightedDot = coordinate;
-    
+        
         // Draw the magnifier to update its view with the highlighted dot
         drawMagnifier(coordinate.x, coordinate.y);
     }
+    
     
 
     function highlightCoordinateElement(element, scrollIntoView = true) {

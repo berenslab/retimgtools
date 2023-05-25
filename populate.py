@@ -72,7 +72,7 @@ for img_set in range(1, num_img_set_t1 + 1):
 # task 2
 t2alias = "realism-grading-no-support"
 t2 = Task(
-    description="Grading of DR without decision suppor",
+    description="Grading of DR without decision support",
     category="realism",
     is_active=True,
     alias=t2alias,
