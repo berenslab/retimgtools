@@ -19,6 +19,7 @@ class AnnotationAdmin(admin.ModelAdmin):
         "user",
         "image",
         "coordinates",
+        "mouse_trajectory_summary",  # use the summary method instead of the raw field
         "time_spent",
         "created_at",
         "updated_at",
@@ -26,6 +27,15 @@ class AnnotationAdmin(admin.ModelAdmin):
     list_filter = [
         "user",
     ]
+
+    def mouse_trajectory_summary(self, obj):
+        last_positions = obj.mouse_trajectory[-200:]
+        # Convert the positions to strings and join them with commas
+        return last_positions
+
+    mouse_trajectory_summary.short_description = (
+        "Mouse Trajectory"  # set the column header
+    )
 
     actions = [csvexport]
 
