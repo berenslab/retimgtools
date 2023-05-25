@@ -13,6 +13,7 @@
     <div class="col">
         <canvas id="imageCanvas" width="512" height="512" style="background-image: url({{ image.image.url }});"></canvas>
         <canvas id="magnifierCanvas" width="150" height="150" style="border:1px solid #d3d3d3"></canvas>
+        <canvas id="overlayCanvas" width="512" height="512"></canvas>
     </div>
     <div class="col">
         <div class="coordinate-header">
@@ -241,6 +242,11 @@
             return {label: coordinate.label, x: coordinate.x, y: coordinate.y, color: coordinate.color};
         });
 
+        let existingMouseTrajectory = JSON.parse('{{ existing_mouse_trajectory }}');
+        let totalMouseTrajectory = existingMouseTrajectory.concat(mouse_trajectory);
+        
+
+
         // Add coordinates to form
         const coordinatesInput = document.createElement('input');
         coordinatesInput.type = 'hidden';
@@ -254,6 +260,13 @@
         timeInput.name = 'time_spent';
         timeInput.value = timeSpent;
         form.appendChild(timeInput);
+
+        // Add mouse_trajectory to form
+        const trajectoryInput = document.createElement('input');
+        trajectoryInput.type = 'hidden';
+        trajectoryInput.name = 'mouse_trajectory';
+        trajectoryInput.value = JSON.stringify(totalMouseTrajectory);
+        form.appendChild(trajectoryInput);
         
         // Submit the form
         form.submit();
@@ -484,7 +497,43 @@
 
         }
     }
+
+    const overlayCtx = imageCanvas.getContext('2d');
+    let mouse_trajectory = [];
+    let mouseInterval;
+    let debugMode = {% if user.is_superuser or user.is_staff %}true{% else %}false{% endif %};
     
+    canvas.addEventListener('mousemove', function(event) {
+        // Update the mouse position when it moves over the canvas
+        mousePosition = {
+            x: event.clientX - canvas.getBoundingClientRect().left,
+            y: event.clientY - canvas.getBoundingClientRect().top
+        };
+    });
+
+    canvas.addEventListener('mouseenter', function(event) {
+        mouseInterval = setInterval(function() {
+            mouse_trajectory.push({
+                x: mousePosition.x,
+                y: mousePosition.y,
+                time: Date.now()
+            });
+
+            // Only draw the trajectory in debug mode
+            if (debugMode) {
+                overlayCtx.strokeStyle = 'rgba(173, 255, 47, 0.5)';  // Transparent yellow green
+                overlayCtx.lineWidth = 2;
+                overlayCtx.beginPath();
+                overlayCtx.moveTo(mouse_trajectory[mouse_trajectory.length-2]?.x || mouse_trajectory[0].x, mouse_trajectory[mouse_trajectory.length-2]?.y || mouse_trajectory[0].y);
+                overlayCtx.lineTo(mouse_trajectory[mouse_trajectory.length-1].x, mouse_trajectory[mouse_trajectory.length-1].y);
+                overlayCtx.stroke();
+            }
+        }, 150); // Update mouse position every 150ms
+    });
+
+    canvas.addEventListener('mouseleave', function() {
+        clearInterval(mouseInterval);
+    });
     
 </script>
 
