@@ -501,7 +501,7 @@
     const overlayCtx = imageCanvas.getContext('2d');
     let mouse_trajectory = [];
     let mouseInterval;
-    let debugMode = true;  // Set to false in production
+    let debugMode = {% if user.is_superuser or user.is_staff %}true{% else %}false{% endif %};
     
     canvas.addEventListener('mousemove', function(event) {
         // Update the mouse position when it moves over the canvas
