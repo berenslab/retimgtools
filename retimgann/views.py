@@ -41,24 +41,25 @@ def annotate(request, image_id):
         if request.method == "POST":
             # Annotation form submitted
             coordinates = json.loads(request.POST.get("coordinates"))
+            mouse_trajectory = json.loads(request.POST.get("mouse_trajectory"))
             time_spent = request.POST.get(
                 "time_spent"
             )  # get the time_spent value from the form
-            mouse_trajectory = json.loads(request.POST.get("mouse_trajectory"))
+
             annotation, created = Annotation.objects.get_or_create(
                 user=request.user,
                 image=image,
                 defaults={
                     "coordinates": json.dumps(coordinates),
-                    "time_spent": time_spent,
                     "mouse_trajectory": json.dumps(mouse_trajectory),
+                    "time_spent": time_spent,
                 },
             )
             if not created:
                 # if the annotation already exists, update the coordinates
                 annotation.coordinates = json.dumps(coordinates)
-                annotation.time_spent = time_spent  # update time_spent
                 annotation.mouse_trajectory = json.dumps(mouse_trajectory)
+                annotation.time_spent = time_spent  # update time_spent
                 annotation.save()
             return redirect("retimgann:annotation_page", image_id=image_id + 1)
     except ObjectDoesNotExist:
@@ -94,10 +95,10 @@ def annotate_submit(request):
     if request.method == "POST":
         # Annotation form submitted
         coordinates = json.loads(request.POST.get("coordinates"))
+        mouse_trajectory = json.loads(request.POST.get("mouse_trajectory"))
         time_spent = request.POST.get(
             "time_spent"
         )  # get the time_spent value from the form
-        mouse_trajectory = json.loads(request.POST.get("mouse_trajectory"))
 
         image_id = request.POST.get("image_id")
         image = Image.objects.get(index=image_id)
@@ -106,15 +107,15 @@ def annotate_submit(request):
             image=image,
             defaults={
                 "coordinates": json.dumps(coordinates),
-                "time_spent": time_spent,
                 "mouse_trajectory": json.dumps(mouse_trajectory),
+                "time_spent": time_spent,
             },
         )
         if not created:
             # if the annotation already exists, update the coordinates and time_spent
             annotation.coordinates = json.dumps(coordinates)
-            annotation.time_spent = time_spent  # update time_spent
             annotation.mouse_trajectory = json.dumps(mouse_trajectory)
+            annotation.time_spent = time_spent  # update time_spent
             annotation.save()
         try:
             return redirect("retimgann:annotation_page", image_id=image_id + 1)
