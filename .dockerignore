@@ -2,4 +2,5 @@ fly.toml
 .gitingore
 .git/
 *.sqlite3
+.retimgtools/
 

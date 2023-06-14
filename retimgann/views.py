@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.views.decorators.cache import cache_control
 from django.views.generic import CreateView, View
 
 from .forms import AnnotationForm, ConsentForm
@@ -33,6 +34,7 @@ class LandingPageView(CreateView):
         return redirect("retimgann:annotation_page", image_id=1)
 
 
+@cache_control(no_cache=True, must_revalidate=True)
 def annotate(request, image_id):
     try:
         image = Image.objects.get(index=image_id)
