@@ -6,7 +6,7 @@ from django.views.generic import CreateView, DetailView, TemplateView, UpdateVie
 from retimgann.models import Annotation, Image
 from retimgeval.models import Answer, Question, Task
 
-from .forms import CustomUserCreationForm
+from .forms import CustomUserChangeForm, CustomUserCreationForm
 
 User = get_user_model()
 
@@ -58,11 +58,12 @@ class AccountDetailView(LoginRequiredMixin, DetailView):
 class AccountUpdateView(LoginRequiredMixin, UpdateView):
     model = User
 
-    fields = [
-        "username",
-        "experience",
-    ]
-
+    # fields = [
+    #     "username",
+    #     "experience",
+    # ]
+    form_class = CustomUserChangeForm
+    exclude = ["password", "last_login", "is_superuser", "is_staff", "is_active"]
     template_name = "accounts/account_update.html"
 
     def get_success_url(self):

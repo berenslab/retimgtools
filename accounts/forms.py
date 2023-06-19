@@ -15,7 +15,7 @@ User = get_user_model()
 
 class CustomUserCreationForm(UserCreationForm):
     experience = forms.IntegerField(required=True)
-    experience.help_text = "Enter your year of experience"
+    experience.help_text = "Enter your number of years of experience in medical retina"
 
     invitation_code = forms.CharField(required=True)
     invitation_code.help_text = "Enter the invitation code you received"
@@ -83,6 +83,9 @@ class CustomUserCreationForm(UserCreationForm):
 
 
 class CustomUserChangeForm(UserChangeForm):
+    experience = forms.IntegerField(required=True)
+    experience.help_text = "Enter your number of years of experience in medical retina"
+
     class Meta:
         model = User
         fields = ("username", "experience")

@@ -24,6 +24,8 @@ class InvitationCode(models.Model):
 
 class CustomUser(AbstractUser):
     experience = models.IntegerField(
-        verbose_name="year of experience", blank=True, null=True
+        verbose_name="Number of  of years of experience in medical retina",
+        blank=True,
+        null=True,
     )
     code_used = models.CharField(max_length=100, null=True, blank=True)
