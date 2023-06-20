@@ -8,17 +8,4 @@ db.sqlite3
 */migrations/*
 !*/migrations/__init__.py
 
-media/annotate/*
-media/evaluate/Task1/*
-media/evaluate/Task2/cond1/*
-media/evaluate/Task2/cond2/*
-
-!media/annotate/1396_left.png
-!media/evaluate/Task1/1a.png
-!media/evaluate/Task1/1b.png
-!media/evaluate/Task1/1c.png
-!media/evaluate/Task2/cond1/1.png
-!media/evaluate/Task2/cond2/1a.png
-!media/evaluate/Task2/cond2/1b.png
-!media/evaluate/Task2/cond2/1c.png
-
+*media/

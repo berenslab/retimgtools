@@ -17,10 +17,16 @@ class Task(models.Model):
         return self.description
 
     def get_absolute_url(self, *args, **kwargs):
-        return reverse(
-            "retimgeval:question_detail",
-            kwargs={"slug": f"{self.alias}-q1p1"},
-        )
+        if self.category == "realism-funds" or self.category == "realism-oct":
+            return reverse(
+                "retimgeval:question_detail",
+                kwargs={"slug": f"{self.alias}-q1"},
+            )
+        else:
+            return reverse(
+                "retimgeval:question_detail",
+                kwargs={"slug": f"{self.alias}-q1p1"},
+            )
 
 
 class Question(models.Model):

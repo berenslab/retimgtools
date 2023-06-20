@@ -33,7 +33,10 @@ class TaskInstructionView(CreateView):
                 defaults={"consented": form.cleaned_data.get("consented")},
             )
             consent.save()
-            return redirect("retimgeval:question_detail", slug=f"{alias}-q1p1")
+            if task.alias == "realism-fundus" or task.alias == "realism-oct":
+                return redirect("retimgeval:question_detail", slug=f"{alias}-q1")
+            else:
+                return redirect("retimgeval:question_detail", slug=f"{alias}-q1p1")
         else:
             context = {"task": task, "form": form}
             return render(request, "retimgeval/task_instruction.html", context)

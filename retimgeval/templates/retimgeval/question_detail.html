@@ -8,7 +8,7 @@
 <h1>{{ question.description }}</h1>
 
 <table>
-    {% if question.task.alias == "realism"%}
+    {% if question.task.alias == "realism-fundus" or question.task.alias == "realism-oct" %}
     <tr>
         {% if question.image1 %}<th>a</th>{% endif %}
         {% if question.image2 %}<th>b</th>{% endif %}

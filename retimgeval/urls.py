@@ -12,7 +12,7 @@ urlpatterns = [
         name="task_instruction",
     ),
     path(
-        "<str:slug>",
+        "<str:slug>/",
         views.question_detail,
         name="question_detail",
     ),

@@ -11,7 +11,8 @@
 </div>
 <ul class="list-group">
   {% for task in tasks %}
-    {% if task.category == "realism" %}
+
+    {% if task.category == "realism-fundus" or task.category == "realism-oct" %}
       <li class="list-group-item">
         {% if task.is_active %}
           <a href="{% url 'retimgeval:task_instruction' task.alias %}" class="text-decoration-none">{{ task.description }}</a> (active)
