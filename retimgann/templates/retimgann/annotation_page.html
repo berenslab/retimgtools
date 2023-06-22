@@ -7,13 +7,17 @@
 {% if user.is_authenticated %}
 
 <h1>Lesion annotation for diabetic retinopathy (DR)</h1>
-
 <div class="row">
     <h4>Annotating image {{ image.index }} / {{ total_num_images }}</h4>
     <div class="col">
         <canvas id="imageCanvas" width="512" height="512" style="background-image: url({{ image.image.url }});"></canvas>
-        <canvas id="magnifierCanvas" width="150" height="150" style="border:1px solid #d3d3d3"></canvas>
+        <div style="postion">
+            <input type="checkbox" id="magnifierToggle" name="magnifierToggle" value="Fixed">
+            <label for="magnifierToggle">Keep magnifier fixed</label>
+        </div>
+        <canvas id="magnifierCanvas" width="150" height="150" style="border:1px solid #d3d3d3;"></canvas>
     </div>
+    
     <div class="col">
         <div class="coordinate-header">
             <h5>Logged Coordinates</h5>
@@ -105,11 +109,15 @@
     const magnifierCtx = magnifierCanvas.getContext('2d');
     const magnifierSize = 150;
     const zoomLevel = 2;
+    const magnifierToggle = document.getElementById('magnifierToggle');
+    let fixedX = 0;
+    let fixedY = canvas.height;
     let selectedLabel = null;
     let coordinates = [];
     let lastHighlightedDot = null;
     let lastHighlightedDotImage = null; // Stores the image data before drawing highlight
     let loadTime = Date.now(); // Store the time when the page was loaded
+
 
     let img = new Image();
     img.src = '{{ image.image.url }}';
@@ -319,7 +327,45 @@
         magnifierCtx.beginPath();
         magnifierCtx.arc(magnifierSize / 2, magnifierSize / 2, 10, 0, 2 * Math.PI); // x, y, radius, startAngle, endAngle
         magnifierCtx.stroke();
+
+        if (magnifierToggle.checked) {
+            // If checkbox is checked, keep the magnifier at the fixed position
+            magnifierCanvas.style.position = 'static';  // or 'relative', based on the original setting
+            magnifierCanvas.style.left = '';
+            magnifierCanvas.style.top = '';
+        } else {
+            // If checkbox is not checked, move the magnifier with the mouse
+            magnifierCanvas.style.position = 'fixed';
+            const rect = imageCanvas.getBoundingClientRect();
+            magnifierCanvas.style.left = (x + rect.left + 10) + 'px';
+            magnifierCanvas.style.top = (y + rect.top + 10) + 'px';
+     
+        }
     }
+
+    imageCanvas.addEventListener('mousemove', function(e) {
+        const rect = this.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        if (!magnifierToggle.checked) {
+            // if magnifier is not fixed, update its position
+            drawMagnifier(x, y);
+        }
+    });
+    
+    magnifierToggle.addEventListener('change', function() {
+        if (this.checked) {
+            // checkbox is checked, reset magnifier to the original position
+            drawMagnifier(fixedX, fixedY);
+        } else {
+            // checkbox is not checked, move magnifier to the last mouse position
+            const rect = imageCanvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            drawMagnifier(x, y);
+        }
+    });
 
     function showCoordinate(coordinate) {
         // Clear the canvas
@@ -500,7 +546,7 @@
     const overlayCtx = imageCanvas.getContext('2d');
     let mouse_trajectory = [];
     let mouseInterval;
-    let debugMode = {% if user.is_superuser or user.is_staff %}true{% else %}false{% endif %};
+    let debugMode = false;
     
     canvas.addEventListener('mousemove', function(event) {
         // Update the mouse position when it moves over the canvas
