@@ -66,8 +66,8 @@
     const form = document.querySelector("form");
 
     // for task 1 only  
-    {% if question.task.alias == "realism" %}
-      const delayTimes = [5000, 10000, 20000];  // Delay times in milliseconds
+    {% if question.task.alias == "realism-oct" or question.task.alias == "realism-fundus" %}
+      const delayTimes = [20000];  // Delay times in milliseconds
       const delayTime = delayTimes[Math.floor(Math.random() * delayTimes.length)];  // Select random delay time
   
       const delayInput = document.createElement("input");
