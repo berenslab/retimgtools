@@ -6,13 +6,35 @@
 
 {% if user.is_authenticated %}
 
-<div class="mb-3">
+<div class="mb-2">
   <h2 class="d-inline-block me-3">Decision support through AI-generated images</h2>
+</div>
+
+<div class="mb-2">
+  <h4 class="d-inline-block me-3">Fundus</h4>
 </div>
 
 <ul class="list-group">
   {% for task in tasks %}
-    {% if task.category == "realism-fundus" or task.category == "realism-oct" %}
+    {% if task.category == "realism-fundus" %}
+      <li class="list-group-item">
+        {% if task.is_active %}
+          <a href="{% url 'retimgeval:task_instruction' task.alias %}" class="text-decoration-none">{{ task.description }}</a> (active)
+        {% else %}
+          <span>{{ task.description }} (inactive)</span>
+        {% endif %}
+      </li>
+    {% endif %}
+  {% endfor %}
+</ul>
+
+<div class="mt-3 mb-2">
+  <h4 class="d-inline-block me-3">OCT</h4>
+</div>
+
+<ul class="list-group">
+  {% for task in tasks %}
+    {% if task.category == "realism-oct" %}
       <li class="list-group-item">
         {% if task.is_active %}
           <a href="{% url 'retimgeval:task_instruction' task.alias %}" class="text-decoration-none">{{ task.description }}</a> (active)

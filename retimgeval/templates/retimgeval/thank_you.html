@@ -7,7 +7,8 @@
       <p class="lead">You have completed this task.</p>
       <hr class="my-4">
       {% if next_link %}
-        <a class="btn btn-primary btn-lg" href="{{ next_link }}" role="button">Start next task</a>
+        <a class="btn btn-primary btn-lg" href="{{ next_link }}" role="button">Start next task now</a>
+        <div>Or you may continue later with the next task from the <a href="/">home page.</a></div>
       {% else %}
         <p class="lead">No more tasks available. Thanks for your participation!</p>
       {% endif %}

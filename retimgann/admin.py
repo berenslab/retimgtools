@@ -39,5 +39,7 @@ class AnnotationAdmin(admin.ModelAdmin):
 
     actions = [csvexport]
 
+    list_per_page = 5000
+
 
 admin.site.register(Annotation, AnnotationAdmin)

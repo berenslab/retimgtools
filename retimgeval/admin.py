@@ -36,6 +36,8 @@ class AnswerAdmin(admin.ModelAdmin):
 
     actions = [csvexport]
 
+    list_per_page = 5000
+
 
 class TaskAdmin(admin.ModelAdmin):
     list_display = ("category", "alias", "description", "is_active", "created_at")
