@@ -35,20 +35,32 @@
     <tr>
         {% if question.image1 %}
         <td>
-            <canvas class="imageCanvas" width="450" height="450" data-src="{{ question.image1.url }}"></canvas>
-            <canvas class="magnifierCanvas" width="150" height="150" style="{% if question.task.alias == "realism" %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+            <div>
+                <canvas class="imageCanvas" width="256" height="256" data-src="{{ question.image1.url }}"></canvas>
+            </div>
+            <div>
+                <canvas class="magnifierCanvas" width="150" height="150" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+            </div>
         </td>
         {% endif %}
         {% if question.image2 %}
             <td>
-                <canvas class="imageCanvas" width="450" height="450" data-src="{{ question.image2.url }}"></canvas>
-                <canvas class="magnifierCanvas" width="150" height="150" style="{% if question.task.alias == "realism" %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+                <div>
+                    <canvas class="imageCanvas" width="256" height="256" data-src="{{ question.image2.url }}"></canvas>
+                </div>
+                <div>
+                    <canvas class="magnifierCanvas" width="150" height="150" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+                </div>
             </td>
         {% endif %}
         {% if question.image3 %}
             <td>
-                <canvas class="imageCanvas" width="450" height="450" data-src="{{ question.image3.url }}"></canvas>
-                <canvas class="magnifierCanvas" width="150" height="150" style="{% if question.task.alias == "realism" %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+                <div>
+                    <canvas class="imageCanvas" width="256" height="256" data-src="{{ question.image3.url }}"></canvas>
+                </div>
+                <div>
+                    <canvas class="magnifierCanvas" width="150" height="150" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+                </div>
             </td>
         {% endif %}
     </tr>

@@ -17,7 +17,7 @@ class Task(models.Model):
         return self.description
 
     def get_absolute_url(self, *args, **kwargs):
-        if self.category == "realism-funds" or self.category == "realism-oct":
+        if self.alias == "realism-fundus" or self.alias == "realism-oct":
             return reverse(
                 "retimgeval:question_detail",
                 kwargs={"slug": f"{self.alias}-q1"},

@@ -9,9 +9,9 @@
 <div class="mb-3">
   <h2 class="d-inline-block me-3">Decision support through AI-generated images</h2>
 </div>
+
 <ul class="list-group">
   {% for task in tasks %}
-
     {% if task.category == "realism-fundus" or task.category == "realism-oct" %}
       <li class="list-group-item">
         {% if task.is_active %}
