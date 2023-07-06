@@ -72,7 +72,26 @@
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
 
-
+<style>
+    #id_choice {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+    }
+    
+    #id_choice > div {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-right: 20px; 
+    }
+    
+    #id_choice > div > label {
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+    }
+</style>
 <script>
 
     const form = document.querySelector("form");
