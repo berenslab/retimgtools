@@ -54,7 +54,7 @@
     <a href="/annotate" class="text-decoration-none">Lesion annotation for diabetic retinopathy (DR)</a> (active)
   </li>
   {% for task in tasks %}
-    {% if task.category == "bagnet" %}
+    {% if "bagnet" in task.category %}
       <li class="list-group-item">
         {% if task.is_active %}
           <a href="{% url 'retimgeval:task_instruction' task.alias %}" class="text-decoration-none">{{ task.description }}</a> (active)

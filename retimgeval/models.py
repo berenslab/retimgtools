@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
+from PIL import Image as PilImage
 
 User = get_user_model()
 
@@ -32,14 +33,36 @@ class Task(models.Model):
 class Question(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     description = models.CharField(max_length=200)
+
     image1 = models.ImageField(upload_to="images/", blank=True, null=True)
+    image1_width = models.PositiveIntegerField(default=256)
+    image1_height = models.PositiveIntegerField(default=256)
+
     image2 = models.ImageField(upload_to="images/", blank=True, null=True)
+    image2_width = models.PositiveIntegerField(default=256)
+    image2_height = models.PositiveIntegerField(default=256)
+
     image3 = models.ImageField(upload_to="images/", blank=True, null=True)
+    image3_width = models.PositiveIntegerField(default=256)
+    image3_height = models.PositiveIntegerField(default=256)
+
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     slug = models.SlugField(max_length=200, blank=True, null=True)
 
     def __str__(self):
         return self.description
+
+    def save(self, *args, **kwargs):
+        if self.image1:
+            image1 = PilImage.open(self.image1.path)
+            self.image1_width, self.image1_height = image1.size
+        if self.image2:
+            image2 = PilImage.open(self.image2.path)
+            self.image2_width, self.image2_height = image2.size
+        if self.image3:
+            image3 = PilImage.open(self.image3.path)
+            self.image3_width, self.image3_height = image3.size
+        super().save(*args, **kwargs)
 
 
 class Choice(models.Model):

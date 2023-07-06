@@ -36,7 +36,7 @@
         {% if question.image1 %}
         <td>
             <div>
-                <canvas class="imageCanvas" width="256" height="256" data-src="{{ question.image1.url }}"></canvas>
+                <canvas class="imageCanvas" width="{{ question.image1_width }}" height="{{ question.image1_height }}" data-src="{{ question.image1.url }}"></canvas>
             </div>
             <div>
                 <canvas class="magnifierCanvas" width="150" height="150" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
@@ -46,7 +46,7 @@
         {% if question.image2 %}
             <td>
                 <div>
-                    <canvas class="imageCanvas" width="256" height="256" data-src="{{ question.image2.url }}"></canvas>
+                    <canvas class="imageCanvas" width="{{ question.image2_width }}" height="{{ question.image2_height }}" data-src="{{ question.image2.url }}"></canvas>
                 </div>
                 <div>
                     <canvas class="magnifierCanvas" width="150" height="150" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
@@ -56,7 +56,7 @@
         {% if question.image3 %}
             <td>
                 <div>
-                    <canvas class="imageCanvas" width="256" height="256" data-src="{{ question.image3.url }}"></canvas>
+                    <canvas class="imageCanvas" width="{{ question.image3_width }}" height="{{ question.image3_height }}" data-src="{{ question.image3.url }}"></canvas>
                 </div>
                 <div>
                     <canvas class="magnifierCanvas" width="150" height="150" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
