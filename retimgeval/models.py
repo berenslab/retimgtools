@@ -46,6 +46,14 @@ class Question(models.Model):
     image3_width = models.PositiveIntegerField(default=256)
     image3_height = models.PositiveIntegerField(default=256)
 
+    image4 = models.ImageField(upload_to="images/", blank=True, null=True)
+    image4_width = models.PositiveIntegerField(default=256)
+    image4_height = models.PositiveIntegerField(default=256)
+
+    image5 = models.ImageField(upload_to="images/", blank=True, null=True)
+    image5_width = models.PositiveIntegerField(default=256)
+    image5_height = models.PositiveIntegerField(default=256)
+
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     slug = models.SlugField(max_length=200, blank=True, null=True)
 
@@ -62,6 +70,15 @@ class Question(models.Model):
         if self.image3:
             image3 = PilImage.open(self.image3.path)
             self.image3_width, self.image3_height = image3.size
+
+        if self.image4:
+            image4 = PilImage.open(self.image4.path)
+            self.image4_width, self.image4_height = image4.size
+
+        if self.image5:
+            image5 = PilImage.open(self.image5.path)
+            self.image5_width, self.image5_height = image5.size
+
         super().save(*args, **kwargs)
 
 

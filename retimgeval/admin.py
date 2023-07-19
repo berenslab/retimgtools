@@ -36,7 +36,7 @@ class AnswerAdmin(admin.ModelAdmin):
 
     actions = [csvexport]
 
-    list_per_page = 5000
+    list_per_page = 1000
 
 
 class TaskAdmin(admin.ModelAdmin):
