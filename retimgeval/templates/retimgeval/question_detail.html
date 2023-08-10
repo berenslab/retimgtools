@@ -41,7 +41,7 @@
                 <canvas class="imageCanvas" width="{{ question.image1_width }}" height="{{ question.image1_height }}" data-src="{{ question.image1.url }}"></canvas>
             </div>
             <div>
-                <canvas class="magnifierCanvas" width="150" height="150" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+                <canvas class="magnifierCanvas" width="100" height="100" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
             </div>
         </td>
         {% endif %}
@@ -51,7 +51,7 @@
                     <canvas class="imageCanvas" width="{{ question.image2_width }}" height="{{ question.image2_height }}" data-src="{{ question.image2.url }}"></canvas>
                 </div>
                 <div>
-                    <canvas class="magnifierCanvas" width="150" height="150" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+                    <canvas class="magnifierCanvas" width="100" height="100" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
                 </div>
             </td>
         {% endif %}
@@ -61,7 +61,7 @@
                     <canvas class="imageCanvas" width="{{ question.image3_width }}" height="{{ question.image3_height }}" data-src="{{ question.image3.url }}"></canvas>
                 </div>
                 <div>
-                    <canvas class="magnifierCanvas" width="150" height="150" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+                    <canvas class="magnifierCanvas" width="100" height="100" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
                 </div>
             </td>
         {% endif %}
@@ -72,7 +72,7 @@
                     <canvas class="imageCanvas" width="{{ question.image4_width }}" height="{{ question.image4_height }}" data-src="{{ question.image4.url }}"></canvas>
                 </div>
                 <div>
-                    <canvas class="magnifierCanvas" width="150" height="150" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+                    <canvas class="magnifierCanvas" width="100" height="100" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
                 </div>
             </td>
         {% endif %}
@@ -83,7 +83,7 @@
                     <canvas class="imageCanvas" width="{{ question.image5_width }}" height="{{ question.image5_height }}" data-src="{{ question.image5.url }}"></canvas>
                 </div>
                 <div>
-                    <canvas class="magnifierCanvas" width="150" height="150" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+                    <canvas class="magnifierCanvas" width="100" height="100" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
                 </div>
             </td>
         {% endif %}
@@ -95,6 +95,36 @@
   {{ form.as_p }} {% csrf_token %}
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
+
+{% if "grading" in question.task.alias %}
+<div class="options mt-4 mb-5">
+    <h5>Options for magnifiers</h5>
+    <div class="row">
+        <div class="col">
+            <label for="showCircleToggle">Show Circle</label>
+            <input type="checkbox" id="showCircleToggle" name="showCircleToggle">
+        </div>
+        <div class="col">
+            <label for="magnifierSize">Magnifier Size:</label>
+            <select id="magnifierSizeSelect">
+                <option value="50">Smaller</option>
+                <option value="100" selected>Small</option>
+                <option value="150">Medium</option>
+                <option value="200">Large</option>
+            </select>
+        </div>
+        <div class="col">
+            <label for="zoomLevel">Zoom Level:</label>
+            <select id="zoomLevelSelect">
+                <option value="1.5">1.5x</option>
+                <option value="2" selected>2x</option>
+                <option value="2.5">2.5x</option>
+                <option value="3">3x</option>
+            </select>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <style>
     #id_choice {
@@ -157,8 +187,29 @@
     // for all tasks
     const imageCanvases = document.querySelectorAll('.imageCanvas');
     const magnifierCanvases = document.querySelectorAll('.magnifierCanvas');
-    const magnifierSize = 150;
-    const zoomLevel = 2;
+    const magnifierToggle = document.getElementById('magnifierToggle');
+    const showCircleToggle = document.getElementById('showCircleToggle');
+
+    const magnifierSizeSelect = document.getElementById('magnifierSizeSelect');
+    const zoomLevelSelect = document.getElementById('zoomLevelSelect');
+
+    // Event listener for magnifier size
+    let magnifierSize = 100;
+    
+    magnifierSizeSelect.addEventListener('change', function() {
+
+        magnifierSize = parseInt(this.value);
+        magnifierCanvases.forEach(magnifierCanvas => {
+            magnifierCanvas.width = magnifierSize;
+            magnifierCanvas.height = magnifierSize;
+        })
+    });
+
+    let zoomLevel = 2;
+    // Event listener for zoom level
+    zoomLevelSelect.addEventListener('change', function() {
+        zoomLevel = parseFloat(this.value);
+    });
 
     const clearMagnifiers = () => {
         magnifierCanvases.forEach(magnifierCanvas => {
@@ -213,11 +264,13 @@
             sourceHeight * zoomLevel
         );
 
-        magnifierCtx.beginPath();
-        magnifierCtx.arc(magnifierSize / 2, magnifierSize / 2, 5, 0, 2 * Math.PI); // x, y, radius, startAngle, endAngle
-        magnifierCtx.strokeStyle = 'black';
-        magnifierCtx.lineWidth = 2;
-        magnifierCtx.stroke();
+        if (showCircleToggle.checked) {
+            magnifierCtx.beginPath();
+            magnifierCtx.arc(magnifierSize / 2, magnifierSize / 2, 5, 0, 2 * Math.PI); // x, y, radius, startAngle, endAngle
+            magnifierCtx.strokeStyle = 'black';
+            magnifierCtx.lineWidth = 2;
+            magnifierCtx.stroke();
+        }
     };
 
     const updateMagnifiers = (x, y, imageCanvas) => {
