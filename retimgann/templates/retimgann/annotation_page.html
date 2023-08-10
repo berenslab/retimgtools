@@ -11,17 +11,48 @@
     <h4>Annotating image {{ image.index }} / {{ total_num_images }}</h4>
     <div class="col">
         <canvas id="imageCanvas" width="512" height="512" style="background-image: url({{ image.image.url }});"></canvas>
-        <div style="postion">
-            <input type="checkbox" id="magnifierToggle" name="magnifierToggle" value="Fixed">
-            <label for="magnifierToggle">Keep magnifier fixed</label>
-        </div>
-        <canvas id="magnifierCanvas" width="150" height="150" style="border:1px solid #d3d3d3;"></canvas>
+        <br>
+        <canvas id="magnifierCanvas" width="100" height="100" style="border:1px solid #d3d3d3;"></canvas>
     </div>
     
     <div class="col">
+        <div class="options mb-4">
+            <h5>Options</h5>
+            <div class="row">
+                <div class="col">
+                    <label for="magnifierToggle">Fix magnifier</label>
+                    <input type="checkbox" id="magnifierToggle" name="magnifierToggle" value="Fixed">
+                </div>
+                <div class="col">
+                    <label for="showCircleToggle">Show Circle</label>
+                    <input type="checkbox" id="showCircleToggle" name="showCircleToggle">
+                </div>
+                <div class="col">
+                    <label for="magnifierSize">Magnifier Size:</label>
+                    <select id="magnifierSizeSelect">
+                        <option value="50">Smaller</option>
+                        <option value="100" selected>Small</option>
+                        <option value="150">Medium</option>
+                        <option value="200">Large</option>
+                        <option value="250">Larger</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="zoomLevel">Zoom Level:</label>
+                    <select id="zoomLevelSelect">
+                        <option value="1.5">1.5x</option>
+                        <option value="2" selected>2x</option>
+                        <option value="2.5">2.5x</option>
+                        <option value="3">3x</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+
         <div class="coordinate-header">
             <h5>Logged Coordinates</h5>
-            <button id="deleteAllButton" class="btn btn-danger">Delete All</button>
+            <button id="deleteAllButton" class="btn btn-danger btn-sm">Delete All</button>
         </div>
         <div id="print_coordinates"></div>
         <br/>
@@ -107,9 +138,10 @@
     const coordinatesContainer = document.getElementById('print_coordinates');
     const magnifierCanvas = document.getElementById('magnifierCanvas');
     const magnifierCtx = magnifierCanvas.getContext('2d');
-    const magnifierSize = 150;
-    const zoomLevel = 2;
+    let magnifierSize = 150;
+    let zoomLevel = 2;
     const magnifierToggle = document.getElementById('magnifierToggle');
+    const showCircleToggle = document.getElementById('showCircleToggle');
     let fixedX = 0;
     let fixedY = canvas.height;
     let selectedLabel = null;
@@ -125,6 +157,21 @@
         ctx.drawImage(img, 0, 0, 512, 512);
         loadExistingCoordinates();
     };
+
+    const magnifierSizeSelect = document.getElementById('magnifierSizeSelect');
+    const zoomLevelSelect = document.getElementById('zoomLevelSelect');
+
+    // Event listener for magnifier size
+    magnifierSizeSelect.addEventListener('change', function() {
+        magnifierSize = parseInt(this.value);
+        magnifierCanvas.width = magnifierSize;
+        magnifierCanvas.height = magnifierSize;
+    });
+
+    // Event listener for zoom level
+    zoomLevelSelect.addEventListener('change', function() {
+        zoomLevel = parseFloat(this.value);
+    });
 
     document.querySelectorAll('input[name="label"]').forEach((radio) => {
         radio.addEventListener('change', (event) => {
@@ -324,9 +371,11 @@
             sourceHeight * zoomLevel
         );
 
-        magnifierCtx.beginPath();
-        magnifierCtx.arc(magnifierSize / 2, magnifierSize / 2, 10, 0, 2 * Math.PI); // x, y, radius, startAngle, endAngle
-        magnifierCtx.stroke();
+        if (showCircleToggle.checked) {
+            magnifierCtx.beginPath();
+            magnifierCtx.arc(magnifierSize / 2, magnifierSize / 2, 10, 0, 2 * Math.PI);
+            magnifierCtx.stroke();
+        }
 
         if (magnifierToggle.checked) {
             // If checkbox is checked, keep the magnifier at the fixed position
