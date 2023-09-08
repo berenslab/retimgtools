@@ -16,9 +16,9 @@ class ChoiceInline(admin.TabularInline):
 
 
 class ChoiceAdmin(admin.ModelAdmin):
-    list_display = ("choice_text", "sub_question", "created_at")
+    list_display = ("choice_text", "question", "sub_question", "created_at")
     list_filter = ("sub_question", "created_at")
-    search_fields = ("choice_text", "subquestion")
+    search_fields = ("choice_text", "question", "subquestion")
 
 
 class AnswerAdmin(admin.ModelAdmin):

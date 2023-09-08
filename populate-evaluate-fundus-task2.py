@@ -50,7 +50,7 @@ for img_num in range(1, num_images_without_support + 1):
 
     # Sub-question 1: Diabetic Retinopathy referral
     sub_question1 = main_question.subquestion_set.create(
-        description=f"Does the patient have referable Diabetic Retinopathy (e.g. moderate, severe, or proliferative DR)?",
+        description=f"Diabetic Retinopathy Referal",
         created_at=timezone.now(),
     )
     for choice in ["No DR", "Referable DR"]:

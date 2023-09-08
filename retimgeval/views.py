@@ -33,7 +33,10 @@ class TaskInstructionView(CreateView):
                 defaults={"consented": form.cleaned_data.get("consented")},
             )
             consent.save()
-            return redirect("retimgeval:question_detail", slug=f"{alias}-q1")
+            if "fundus-grading" in task.alias:
+                return redirect("retimgeval:question_detail", slug=f"{alias}-q1p1")
+            else:
+                return redirect("retimgeval:question_detail", slug=f"{alias}-q1")
         else:
             context = {"task": task, "form": form}
             return render(request, "retimgeval/task_instruction.html", context)
@@ -75,53 +78,97 @@ def question_detail(request, slug):
 
     sub_questions = SubQuestion.objects.filter(question=question)
 
-    if request.method == "POST":
-        for sub_question in sub_questions:
-            choice_id = request.POST.get(
-                str(sub_question.id), None
-            )  # Get choice id for each sub-question
-            form_data = {"choice": choice_id}
-            form = AnswerForm(form_data)
-            form.fields["choice"].queryset = sub_question.choice_set.all()
+    if sub_questions.exists():
+        # Handle SubQuestion logic
+        if request.method == "POST":
+            for sub_question in sub_questions:
+                choice_id = request.POST.get(str(sub_question.id), None)
+                form_data = {"choice": choice_id}
+                form = AnswerForm(form_data)
+                form.fields["choice"].queryset = sub_question.choice_set.all()
 
-            if form.is_valid():
-                answer = form.save(commit=False)
-                answer.reaction_time = request.POST.get("reaction_time", None)
-                answer.delay_time = request.POST.get("delay_time", None)
-                answer.task = task
-                answer.question = question
-                answer.sub_question = sub_question  # This assumes your Answer model has a sub_question field
-                answer.user = request.user
-                answer.save()
+                if form.is_valid():
+                    answer = form.save(commit=False)
+                    answer.reaction_time = request.POST.get("reaction_time", None)
+                    answer.delay_time = request.POST.get("delay_time", None)
+                    answer.task = task
+                    answer.question = question
+                    answer.sub_question = sub_question
+                    answer.user = request.user
+                    answer.save()
+                else:
+                    print(
+                        f"Form is not valid for sub_question {sub_question.id}: {form.errors}"
+                    )
+                    return render(
+                        request,
+                        "retimgeval/question_detail.html",
+                        {"form_errors": form.errors},
+                    )
+
+            next_question = get_next_unanswered_question(request, task)
+            if next_question:
+                return redirect("retimgeval:question_detail", slug=next_question.slug)
             else:
-                print(
-                    f"Form is not valid for sub_question {sub_question.id}: {form.errors}"
-                )
-                return render(
-                    request,
-                    "retimgeval/question_detail.html",
-                    {"form_errors": form.errors},
-                )
+                return redirect("retimgeval:thank_you", alias=task.alias)
 
-        next_question = get_next_unanswered_question(request, task)
-        if next_question:
-            return redirect("retimgeval:question_detail", slug=next_question.slug)
         else:
-            return redirect("retimgeval:thank_you", alias=task.alias)
+            sub_questions_and_forms = []
+            for sub_question in sub_questions:
+                form = AnswerForm()
+                form.fields["choice"].queryset = sub_question.choice_set.all()
+                sub_questions_and_forms.append((sub_question, form))
+
+        context = {
+            "question": question,
+            "sub_questions_and_forms": sub_questions_and_forms,
+            "reaction_time": request.GET.get("reaction_time", None),
+            "delay_time": request.GET.get("delay_time", None),
+        }
 
     else:
-        sub_questions_and_forms = []
-        for sub_question in sub_questions:
-            form = AnswerForm()
-            form.fields["choice"].queryset = sub_question.choice_set.all()
-            sub_questions_and_forms.append((sub_question, form))
+        # Handle original Question logic
+        choices = question.choice_set.all()
+        if request.method == "POST":
+            form = AnswerForm(request.POST)
+            form.question = question
+            form.fields["choice"].queryset = Choice.objects.filter(
+                question_id=form.question.pk
+            )
 
-    context = {
-        "question": question,
-        "sub_questions_and_forms": sub_questions_and_forms,
-        "reaction_time": request.GET.get("reaction_time", None),
-        "delay_time": request.GET.get("delay_time", None),
-    }
+            if form.is_valid():
+                option = form.save(commit=False)
+                option.reaction_time = request.POST.get("reaction_time", None)
+                option.delay_time = request.POST.get("delay_time", None)
+                option.task = task
+                option.question = question
+                option.user = request.user
+                option.save()
+
+                next_question = get_next_unanswered_question(request, task)
+                if next_question:
+                    return redirect(
+                        "retimgeval:question_detail", slug=next_question.slug
+                    )
+                else:
+                    return redirect("retimgeval:thank_you", alias=task.alias)
+
+        else:
+            form = AnswerForm()
+            form.question = question
+            form.fields["choice"].queryset = Choice.objects.filter(
+                question_id=form.question.pk
+            )
+            print(Choice.objects.filter(question_id=form.question.pk))
+            print(form)
+
+        context = {
+            "question": question,
+            "choices": choices,
+            "form": form,
+            "reaction_time": request.GET.get("reaction_time", None),
+            "delay_time": request.GET.get("delay_time", None),
+        }
 
     return render(request, "retimgeval/question_detail.html", context)
 
