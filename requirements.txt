@@ -12,3 +12,4 @@ gunicorn
 djangorestframework
 Pillow
 unique_names_generator
+pandas
