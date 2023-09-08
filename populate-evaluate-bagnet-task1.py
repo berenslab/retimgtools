@@ -1,5 +1,8 @@
+import glob
 import os
 import sys
+
+from django.utils import timezone
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "config.settings"
 
@@ -7,19 +10,13 @@ import django
 
 django.setup()
 
-import glob
-
-from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.utils import timezone
 
-from retimgann.models import Image
-from retimgeval.models import Task
+from retimgeval.models import SubQuestion, Task  # import the updated models
 
 User = get_user_model()
 
 # Create a superuser
-
 try:
     user = User.objects.create_user("admin", password="admin")
     user.is_superuser = True
@@ -27,7 +24,6 @@ try:
     user.save()
 except:
     pass
-
 
 # BagNet task 1
 alias = "bagnet-grading-no-support"
@@ -41,29 +37,38 @@ task.save()
 
 all_images = sorted(glob.glob("media/evaluate/BagNet/task1/all_images/*.png"))
 num_images = len(all_images)
+
 for i, img in enumerate(all_images):
     j = i + 1
-    q1 = task.question_set.create(
-        description=f"Q{j}/{num_images} [1/2]: Are there signs of diabetic retinopathy Onset 1?",
-        image1=f"{img[6:]}",
+
+    # Create the main question first
+    main_question = task.question_set.create(
+        description=f"Question {j}/{num_images}",
         created_at=timezone.now(),
-        slug=f"{alias}-q{j}p1",
+        slug=f"{alias}-q{j}",
+        image1=f"{img[6:]}",
     )
 
-    for choice in ["No signs of Onset 1", "There are signs of Onset 1"]:
-        q1.choice_set.create(
+    # Sub-question 1
+    sub_question1 = main_question.subquestion_set.create(
+        description=f"Does the patient have Diabetic Retinopathy (including mild DR)?",
+        created_at=timezone.now(),
+    )
+
+    for choice in ["No DR", "DR"]:
+        sub_question1.choice_set.create(
             choice_text=f"{choice}",
             created_at=timezone.now(),
         )
 
-    q2 = task.question_set.create(
-        description=f"Q{j}/{num_images} [2/2]: How confident are you of the assigned grade?",
+    # Sub-question 2
+    sub_question2 = main_question.subquestion_set.create(
+        description=f"How confident are you of the assigned grade?",
         created_at=timezone.now(),
-        image1=f"{img[6:]}",
-        slug=f"{alias}-q{j}p2",
     )
 
-    for choice in range(1, 11):
-        q2.choice_set.create(
+    for choice in range(1, 6):
+        sub_question2.choice_set.create(
             choice_text=f"{choice}",
+            created_at=timezone.now(),
         )

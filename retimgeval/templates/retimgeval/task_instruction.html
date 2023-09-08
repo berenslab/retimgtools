@@ -36,7 +36,7 @@
             Decide whether the patient shows signs of referable Diabetic Retinopathy (DR), i.e. moderate, severe, or proliferative DR.
         </li>
         <li>
-            Additionally, rate the confidence of your decision on a scale of 1 to 10.
+            Additionally, rate the confidence of your decision on a scale of 1 (least confident) to 5 (most confident).
         </li>
         <li>
             If you move your mouse over a region in the image, you are shown a zoomed version of that image region.
@@ -61,7 +61,7 @@
             Decide whether the patient shows signs of referable Diabetic Retinopathy (DR), i.e. moderate, severe, or proliferative DR.
         </li>
         <li>
-            Additionally, rate the confidence of your decision on a scale of 1 to 10.
+            Additionally, rate the confidence of your decision on a scale of 1 (least confident) to 5 (most confident).
         </li>
         <li>
             If you move your mouse over a region in the image, you are shown a zoomed version of that image region.
@@ -91,10 +91,10 @@
             You will be shown a single fundus image.
         </li>
         <li>
-            Decide whether the patient shows signs (onset 1) of Diabetic Retinopathy (DR), i.e. mild, moderate, severe, or proliferative DR.  
+            Based on the image, decide whether the patient has Diabetic Retinopathy (DR) of any severity, including mild DR.
         </li>
         <li>
-            Additionally, rate the confidence of your decision on a scale of 1 to 10.  
+            Additionally, rate the confidence of your decision on a scale of 1 (least confident) to 5 (most confident).
         </li>
         <li>
             If you move your mouse over a region in the image, you are shown a zoomed version of that image region.  
@@ -110,42 +110,45 @@
     <h3>Instruction</h3>
     <ul>
         <li>
-            You will be shown a single fundus image along with the AI model’s confidence score (from 0 to 1, with 1 being the highest confidence score).  
+            You will be shown a single fundus image along with an AI model’s decision and confidence in percent (from 0% to 100%, with 100% being the highest confidence score).        
         </li>
         <li>
-            Decide whether the image shows any signs (onset 1) of Diabetic Retinopathy (DR), i.e. mild, moderate, severe, or proliferative DR.  
+            Based on the image, decide whether the patient has Diabetic Retinopathy (DR) of any severity, including mild DR.        
         </li>
         <li>
-            Additionally, rate the confidence of your decision on a scale of 1 to 10.  
+            Additionally, rate the confidence of your decision on a scale of 1 (least confident) to 5 (most confident).        
         </li>
         <li>
-            If you move your mouse over a region in the image, you are shown a zoomed version of that image region.  
+            If you move your mouse over a region in the image, you are shown a zoomed version of that image region.        
         </li>
         <li>
-            We record the time you take to reach your decision. 
+            We record the time you take to reach your decision.
         </li>
     </ul>
     {% endif %}
 
     {% if task.alias == "bagnet-grading-with-ai-support-and-bounding-boxes" %}
     <h1>
-        Grading of DR with decision support and bounding boxes 
+        Grading of DR with decision support and explanations from AI
     </h1>
     <h3>
         Instruction
     </h3>
     <ul>
         <li>
-            You will be shown a single fundus image along with the AI model’s confidence score (from 0 to 1, with 1 being the highest confidence score) and some suspicious regions highlighted by the AI model.  
+            You will be shown a single fundus image along with an AI model’s decision and confidence in percent (from 0% to 100%, with 100% being the highest confidence score).
         </li>
         <li>
-            Decide whether the image shows any signs (onset 1) of Diabetic Retinopathy (DR), i.e. mild, moderate, severe, or proliferative DR.  
+            Regions in the image for which the AI model believes that they contain signs of DR will be highlighted by blue boxes. Be aware that some boxes may be erroneously placed and may not contain real lesions. Also, not all lesions are flagged.
         </li>
         <li>
-            Additionally, rate the confidence of your decision on a scale of 1 to 10.  
+            Based on the image, decide whether the patient has Diabetic Retinopathy (DR) of any severity, including mild DR.
         </li>
         <li>
-            If you move your mouse over a region in the image, you are shown a zoomed version of that image region.  
+            Additionally, rate the confidence of your decision on a scale of 1 (least confident) to 5 (most confident).
+        </li>
+        <li>
+            If you move your mouse over a region in the image, you are shown a zoomed version of that image region.
         </li>
         <li>
             We record the time you take to reach your decision. 

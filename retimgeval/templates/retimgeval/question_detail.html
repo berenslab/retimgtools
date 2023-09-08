@@ -24,7 +24,7 @@
         </tr>   
         {% else %}
         <tr>
-            <th>{{ question.image1_title }}</th>
+            <th></th>
         </tr>     
 
         {% endif %}
@@ -39,7 +39,7 @@
             </tr>
         {% else %}
         <tr>
-            <th>Original</th>
+            <th></th>
         </tr>            
         
         {% endif %}
@@ -49,11 +49,21 @@
     <tr>
         {% if question.image1 %}
         <td>
-            <div>
-                <canvas class="imageCanvas" width="{{ question.image1_width }}" height="{{ question.image1_height }}" data-src="{{ question.image1.url }}"></canvas>
-            </div>
-            <div>
-                <canvas class="magnifierCanvas" width="100" height="100" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+            <div class="d-flex align-items-start">
+                <!-- Image canvas -->
+                <div>
+                    <canvas class="imageCanvas" width="{{ question.image1_width }}" height="{{ question.image1_height }}" data-src="{{ question.image1.url }}"></canvas>
+                    <div>
+                        <canvas class="magnifierCanvas" width="100" height="100" style="{% if not 'grading' in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+                    </div>
+                </div>
+                
+                {% if question.image1_title %}
+                <!-- Image title -->
+                <div class="ms-3">
+                    {{ question.image1_title | safe }}
+                </div>
+                {% endif %}
             </div>
         </td>
         {% endif %}
@@ -102,9 +112,20 @@
     </tr>
 </table>
 
-<h2>Answer</h2>
-<form action="{{ question.get_absolute_url}}" method="POST">
-  {{ form.as_p }} {% csrf_token %}
+<form action="{{ question.get_absolute_url }}" method="POST">
+  {% csrf_token %}
+  {% for sub_question, form in sub_questions_and_forms %}
+    <div class="sub-question mt-3">
+      <h4>{{ sub_question.description }}</h4>
+      <div class="sub-question-form">
+        {% for choice in form.choice.field.choices %}
+          <input type="radio" id="{{ choice.0 }}" name="{{ sub_question.id }}" value="{{ choice.0 }}">
+          <label class="me-5" for="{{ choice.0 }}">{{ choice.1 }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <br>
+  {% endfor %}
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
 

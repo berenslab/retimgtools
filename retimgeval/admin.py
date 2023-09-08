@@ -16,9 +16,9 @@ class ChoiceInline(admin.TabularInline):
 
 
 class ChoiceAdmin(admin.ModelAdmin):
-    list_display = ("choice_text", "question", "created_at")
-    list_filter = ("question", "created_at")
-    search_fields = ("choice_text", "question")
+    list_display = ("choice_text", "sub_question", "created_at")
+    list_filter = ("sub_question", "created_at")
+    search_fields = ("choice_text", "subquestion")
 
 
 class AnswerAdmin(admin.ModelAdmin):
@@ -27,6 +27,7 @@ class AnswerAdmin(admin.ModelAdmin):
         "user",
         "task",
         "question",
+        "sub_question",
         "answered_at",
         "reaction_time",
         "delay_time",

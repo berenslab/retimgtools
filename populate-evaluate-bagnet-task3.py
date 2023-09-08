@@ -10,17 +10,14 @@ django.setup()
 import glob
 
 import pandas as pd
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 
-from retimgann.models import Image
-from retimgeval.models import Task
+from retimgeval.models import SubQuestion, Task  # Import SubQuestion
 
 User = get_user_model()
 
 # Create a superuser
-
 try:
     user = User.objects.create_user("admin", password="admin")
     user.is_superuser = True
@@ -28,7 +25,6 @@ try:
     user.save()
 except:
     pass
-
 
 # BagNet task 3
 alias = "bagnet-grading-with-ai-support-and-bounding-boxes"
@@ -50,36 +46,43 @@ all_images_inference = pd.read_csv(
 def get_image_title(image_name):
     row = all_images_inference[all_images_inference["filename"] == image_name]
     if row.pred.values[0] == 0:
-        return f"Our model predicted no signs of Onset 1 with {row.confidence.values[0] * 100:.2f}% confidence."
+        return f"AI model predicts:<br><strong>healthy</strong> ({row.confidence.values[0] * 100:.0f}% confidence)."
     else:
-        return f"Our model predicted signs of Onset 1 with {row.confidence.values[0] * 100:.2f}% confidence."
+        return f"AI model predicts:<br><strong>DR</strong> ({row.confidence.values[0] * 100:.0f}% confidence)."
 
 
 for i, img in enumerate(all_images):
     j = i + 1
-    q1 = task.question_set.create(
-        description=f"Q{j}/{num_images} [1/2]: Are there signs of diabetic retinopathy Onset 1?",
+
+    # Create the main question first
+    main_question = task.question_set.create(
+        description=f"Question {j}/{num_images}",
+        created_at=timezone.now(),
         image1=f"{img[6:]}",
         image1_title=get_image_title(img[6:].split("/")[-1]),
-        created_at=timezone.now(),
-        slug=f"{alias}-q{j}p1",
+        slug=f"{alias}-q{j}",
     )
 
-    for choice in ["No signs of Onset 1", "There are signs of Onset 1"]:
-        q1.choice_set.create(
+    # Sub-question 1
+    sub_question1 = main_question.subquestion_set.create(
+        description=f"Does the patient have Diabetic Retinopathy (including mild DR)?",
+        created_at=timezone.now(),
+    )
+
+    for choice in ["No DR", "DR"]:
+        sub_question1.choice_set.create(
             choice_text=f"{choice}",
             created_at=timezone.now(),
         )
 
-    q2 = task.question_set.create(
-        description=f"Q{j}/{num_images} [2/2]: How confident are you of the assigned grade?",
+    # Sub-question 2
+    sub_question2 = main_question.subquestion_set.create(
+        description=f"How confident are you of the assigned grade?",
         created_at=timezone.now(),
-        image1=f"{img[6:]}",
-        image1_title=get_image_title(img[6:].split("/")[-1]),
-        slug=f"{alias}-q{j}p2",
     )
 
-    for choice in range(1, 11):
-        q2.choice_set.create(
+    for choice in range(1, 6):
+        sub_question2.choice_set.create(
             choice_text=f"{choice}",
+            created_at=timezone.now(),
         )

@@ -18,16 +18,10 @@ class Task(models.Model):
         return self.description
 
     def get_absolute_url(self, *args, **kwargs):
-        if self.alias == "realism-fundus" or self.alias == "realism-oct":
-            return reverse(
-                "retimgeval:question_detail",
-                kwargs={"slug": f"{self.alias}-q1"},
-            )
-        else:
-            return reverse(
-                "retimgeval:question_detail",
-                kwargs={"slug": f"{self.alias}-q1p1"},
-            )
+        return reverse(
+            "retimgeval:question_detail",
+            kwargs={"slug": f"{self.alias}-q1"},
+        )
 
 
 class Question(models.Model):
@@ -87,8 +81,21 @@ class Question(models.Model):
         super().save(*args, **kwargs)
 
 
-class Choice(models.Model):
+class SubQuestion(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    description = models.CharField(max_length=200)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    slug = models.SlugField(max_length=200, blank=True, null=True)
+
+    def __str__(self):
+        return self.description
+
+
+class Choice(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, null=True)
+    sub_question = models.ForeignKey(
+        SubQuestion, on_delete=models.CASCADE, null=True, blank=True
+    )
     choice_text = models.CharField(max_length=200)
     image = models.ImageField(upload_to="images/", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
@@ -100,6 +107,9 @@ class Choice(models.Model):
 class Answer(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    sub_question = models.ForeignKey(
+        SubQuestion, on_delete=models.CASCADE, null=True, blank=True
+    )
     choice = models.ForeignKey(Choice, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)

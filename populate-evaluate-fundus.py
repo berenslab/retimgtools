@@ -28,19 +28,6 @@ try:
 except:
     pass
 
-# Retinal Image Annotation
-
-# all_images = sorted(glob.glob("media/annotate/*.png"))
-
-# for index, image in enumerate(all_images):
-#     img = Image(
-#         image=image[6:],
-#         name=image.split("/")[-1].split(".")[0],
-#         index=index + 1,
-#     )
-#     img.save()
-
-# Retinal Image Evaluation
 
 # fundus task 1
 t1alias = "realism-fundus"
@@ -147,51 +134,3 @@ for img in range(1, num_img_set_t2c2 + 1):
         q2.choice_set.create(
             choice_text=f"{choice}",
         )
-
-# OCT task 1
-# t4alias = "realism-oct"
-# t4 = Task(
-#     description="Realism of AI-generated OCT images",
-#     category="realism-oct",
-#     is_active=True,
-#     alias=t4alias,
-# )
-# t4.save()
-
-# all_image_t4 = sorted(glob.glob("media/evaluate/OCT/Task1/*.png"))
-# num_img_set_t4 = len(set([img[:-5] for img in all_image_t4]))
-# for img_set in range(1, num_img_set_t4 + 1):
-#     q = t4.question_set.create(
-#         description=f"Q{img_set}/{num_img_set_t4}: Which image is fake?",
-#         image1=f"evaluate/OCT/Task1/{img_set}a.png",
-#         image2=f"evaluate/OCT/Task1/{img_set}b.png",
-#         image3=f"evaluate/OCT/Task1/{img_set}c.png",
-#         created_at=timezone.now(),
-#         slug=f"{t4alias}-q{img_set}",
-#     )
-#     for choice in ["a", "b", "c"]:
-#         q.choice_set.create(
-#             choice_text=f"{choice}",
-#             created_at=timezone.now(),
-#         )
-
-
-# # task 5
-# t5alias = "bagnet-grading-no-support"
-# t5 = Task(
-#     description="Grading of DR without decision support",
-#     category="bagnet",
-#     is_active=False,
-#     alias=t5alias,
-# )
-# t4.save()
-
-# # task 5
-# t5alias = "bagnet-grading-with-support"
-# t5 = Task(
-#     description="Grading of DR with decision support",
-#     category="bagnet",
-#     is_active=False,
-#     alias=t5alias,
-# )
-# t5.save()

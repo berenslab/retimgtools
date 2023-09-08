@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.views.generic import CreateView, View
 
 from .forms import AnswerForm, ConsentForm
-from .models import Answer, Choice, Consent, Question, Task
+from .models import Answer, Choice, Consent, Question, SubQuestion, Task
 
 
 class TaskInstructionView(CreateView):
@@ -33,10 +33,7 @@ class TaskInstructionView(CreateView):
                 defaults={"consented": form.cleaned_data.get("consented")},
             )
             consent.save()
-            if task.alias == "realism-fundus" or task.alias == "realism-oct":
-                return redirect("retimgeval:question_detail", slug=f"{alias}-q1")
-            else:
-                return redirect("retimgeval:question_detail", slug=f"{alias}-q1p1")
+            return redirect("retimgeval:question_detail", slug=f"{alias}-q1")
         else:
             context = {"task": task, "form": form}
             return render(request, "retimgeval/task_instruction.html", context)
@@ -63,57 +60,65 @@ def get_next_unanswered_question(request, current_task):
 
 
 def question_detail(request, slug):
-    question = Question.objects.get(slug=slug)
-    task = Task.objects.get(pk=question.task.pk)
+    try:
+        question = Question.objects.get(slug=slug)
+        task = Task.objects.get(pk=question.task.pk)
+    except (Question.DoesNotExist, Task.DoesNotExist):
+        raise Http404("Question or Task not found")
 
     if Answer.objects.filter(question=question, user=request.user).exists():
-        # This question has already been answered
         next_question = get_next_unanswered_question(request, task)
-
         if next_question:
-            # There is another question in this task
             return redirect("retimgeval:question_detail", slug=next_question.slug)
         else:
-            # This was the last question in this task
             return redirect("retimgeval:thank_you", alias=task.alias)
 
-    choices = question.choice_set.all()
+    sub_questions = SubQuestion.objects.filter(question=question)
 
     if request.method == "POST":
-        form = AnswerForm(request.POST)
-        form.question = question
-        form.fields["choice"].queryset = Choice.objects.filter(
-            question_id=form.question.pk
-        )
+        for sub_question in sub_questions:
+            choice_id = request.POST.get(
+                str(sub_question.id), None
+            )  # Get choice id for each sub-question
+            form_data = {"choice": choice_id}
+            form = AnswerForm(form_data)
+            form.fields["choice"].queryset = sub_question.choice_set.all()
 
-        if form.is_valid():
-            option = form.save(commit=False)
-            option.reaction_time = request.POST.get("reaction_time", None)
-            option.delay_time = request.POST.get("delay_time", None)
-            option.task = task
-            option.question = question
-            option.user = request.user
-            option.save()
-
-            next_question = get_next_unanswered_question(request, task)
-            if next_question:
-                # There is another question in this task
-                return redirect("retimgeval:question_detail", slug=next_question.slug)
+            if form.is_valid():
+                answer = form.save(commit=False)
+                answer.reaction_time = request.POST.get("reaction_time", None)
+                answer.delay_time = request.POST.get("delay_time", None)
+                answer.task = task
+                answer.question = question
+                answer.sub_question = sub_question  # This assumes your Answer model has a sub_question field
+                answer.user = request.user
+                answer.save()
             else:
-                # This was the last question in this task
-                return redirect("retimgeval:thank_you", alias=task.alias)
+                print(
+                    f"Form is not valid for sub_question {sub_question.id}: {form.errors}"
+                )
+                return render(
+                    request,
+                    "retimgeval/question_detail.html",
+                    {"form_errors": form.errors},
+                )
+
+        next_question = get_next_unanswered_question(request, task)
+        if next_question:
+            return redirect("retimgeval:question_detail", slug=next_question.slug)
+        else:
+            return redirect("retimgeval:thank_you", alias=task.alias)
 
     else:
-        form = AnswerForm()
-        form.question = question
-        form.fields["choice"].queryset = Choice.objects.filter(
-            question_id=form.question.pk
-        )
+        sub_questions_and_forms = []
+        for sub_question in sub_questions:
+            form = AnswerForm()
+            form.fields["choice"].queryset = sub_question.choice_set.all()
+            sub_questions_and_forms.append((sub_question, form))
 
     context = {
         "question": question,
-        "choices": choices,
-        "form": form,
+        "sub_questions_and_forms": sub_questions_and_forms,
         "reaction_time": request.GET.get("reaction_time", None),
         "delay_time": request.GET.get("delay_time", None),
     }

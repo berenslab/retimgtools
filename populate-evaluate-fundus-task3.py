@@ -1,3 +1,4 @@
+import glob
 import os
 import sys
 
@@ -7,9 +8,6 @@ import django
 
 django.setup()
 
-import glob
-
-import pandas as pd
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 
@@ -26,61 +24,48 @@ try:
 except:
     pass
 
-# BagNet task 2
-alias = "bagnet-grading-with-ai-support"
-task = Task(
+# Grading of DR with decision support
+alias_with_support = "realism-fundus-grading-with-support"
+task_with_support = Task(
     description="Grading of DR with decision support from AI",
-    category="bagnet",
+    category="realism-fundus",
     is_active=True,
-    alias=alias,
+    alias=alias_with_support,
 )
-task.save()
+task_with_support.save()
 
-all_images = sorted(glob.glob("media/evaluate/BagNet/task2/all_images/*.png"))
-num_images = len(all_images)
-all_images_inference = pd.read_csv(
-    "media/evaluate/BagNet/grading_task_test_inference.csv"
-)
+all_images_with_support = sorted(glob.glob("media/evaluate/Fundus/Task2/cond2/*.png"))
+num_images_with_support = (
+    len(all_images_with_support) // 3
+)  # Assuming 3 images per question
 
-
-def get_image_title(image_name):
-    row = all_images_inference[all_images_inference["filename"] == image_name]
-    if row.pred.values[0] == 0:
-        return f"AI model predicts:<br><strong>healthy</strong> ({row.confidence.values[0] * 100:.0f}% confidence)."
-    else:
-        return f"AI model predicts:<br><strong>DR</strong> ({row.confidence.values[0] * 100:.0f}% confidence)."
-
-
-for i, img in enumerate(all_images):
-    j = i + 1
-
+for img_num in range(1, num_images_with_support + 1):
     # Create the main question first
-    main_question = task.question_set.create(
-        description=f"Question {j}/{num_images}",
+    main_question = task_with_support.question_set.create(
+        description=f"Question {img_num}/{num_images_with_support}",
         created_at=timezone.now(),
-        image1=f"{img[6:]}",
-        image1_title=get_image_title(img[6:].split("/")[-1]),
-        slug=f"{alias}-q{j}",
+        image1=f"evaluate/Fundus/Task2/cond2/{img_num}a.png",
+        image2=f"evaluate/Fundus/Task2/cond2/{img_num}b.png",
+        image3=f"evaluate/Fundus/Task2/cond2/{img_num}c.png",
+        slug=f"{alias_with_support}-q{img_num}",
     )
 
-    # Sub-question 1
+    # Sub-question 1: Diabetic Retinopathy referral
     sub_question1 = main_question.subquestion_set.create(
-        description=f"Does the patient have Diabetic Retinopathy (including mild DR)?",
+        description=f"Does the patient have referable Diabetic Retinopathy (e.g. moderate, severe, or proliferative DR)?",
         created_at=timezone.now(),
     )
-
-    for choice in ["No DR", "DR"]:
+    for choice in ["No DR", "Referable DR"]:
         sub_question1.choice_set.create(
             choice_text=f"{choice}",
             created_at=timezone.now(),
         )
 
-    # Sub-question 2
+    # Sub-question 2: How confident are you of the assigned grade?
     sub_question2 = main_question.subquestion_set.create(
         description=f"How confident are you of the assigned grade?",
         created_at=timezone.now(),
     )
-
     for choice in range(1, 6):
         sub_question2.choice_set.create(
             choice_text=f"{choice}",
