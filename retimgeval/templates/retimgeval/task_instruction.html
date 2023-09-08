@@ -83,6 +83,76 @@
         </ul>
     {% endif %}
 
+    {% if task.alias == "bagnet-grading-no-support" %}
+    <h1>Grading of DR without decision support from AI</h1>
+    <h3>Instruction </h3>
+    <ul>
+        <li>
+            You will be shown a single fundus image.
+        </li>
+        <li>
+            Decide whether the patient shows signs (onset 1) of Diabetic Retinopathy (DR), i.e. mild, moderate, severe, or proliferative DR.  
+        </li>
+        <li>
+            Additionally, rate the confidence of your decision on a scale of 1 to 10.  
+        </li>
+        <li>
+            If you move your mouse over a region in the image, you are shown a zoomed version of that image region.  
+        </li>
+        <li>
+            We record the time you take to reach your decision. 
+        </li>
+    </ul>
+    {% endif %}
+
+    {% if task.alias == "bagnet-grading-with-ai-support" %}
+    <h1>Grading of DR with decision support from AI</h1>
+    <h3>Instruction</h3>
+    <ul>
+        <li>
+            You will be shown a single fundus image along with the AI model’s confidence score (from 0 to 1, with 1 being the highest confidence score).  
+        </li>
+        <li>
+            Decide whether the image shows any signs (onset 1) of Diabetic Retinopathy (DR), i.e. mild, moderate, severe, or proliferative DR.  
+        </li>
+        <li>
+            Additionally, rate the confidence of your decision on a scale of 1 to 10.  
+        </li>
+        <li>
+            If you move your mouse over a region in the image, you are shown a zoomed version of that image region.  
+        </li>
+        <li>
+            We record the time you take to reach your decision. 
+        </li>
+    </ul>
+    {% endif %}
+
+    {% if task.alias == "bagnet-grading-with-ai-support-and-bounding-boxes" %}
+    <h1>
+        Grading of DR with decision support and bounding boxes 
+    </h1>
+    <h3>
+        Instruction
+    </h3>
+    <ul>
+        <li>
+            You will be shown a single fundus image along with the AI model’s confidence score (from 0 to 1, with 1 being the highest confidence score) and some suspicious regions highlighted by the AI model. Some bounding boxes may not contain suspicious regions.  
+        </li>
+        <li>
+            Decide whether the image shows any signs (onset 1) of Diabetic Retinopathy (DR), i.e. mild, moderate, severe, or proliferative DR.  
+        </li>
+        <li>
+            Additionally, rate the confidence of your decision on a scale of 1 to 10.  
+        </li>
+        <li>
+            If you move your mouse over a region in the image, you are shown a zoomed version of that image region.  
+        </li>
+        <li>
+            We record the time you take to reach your decision. 
+        </li>
+    </ul>
+    {% endif %}
+
     {% if not already_consented %}
         <form method="post">
             <h3>Information about the study</h3>

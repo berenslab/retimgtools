@@ -9,6 +9,7 @@ django.setup()
 
 import glob
 
+import pandas as pd
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -29,23 +30,37 @@ except:
     pass
 
 
-# BagNet task 1
-alias = "bagnet-grading-no-support"
+# BagNet task 2
+alias = "bagnet-grading-with-ai-support"
 task = Task(
-    description="Grading of DR without decision support",
+    description="Grading of DR with decision support from AI",
     category="bagnet",
     is_active=True,
     alias=alias,
 )
 task.save()
 
-all_images = sorted(glob.glob("media/evaluate/BagNet/task1/all_images/*.png"))
+all_images = sorted(glob.glob("media/evaluate/BagNet/task2/all_images/*.png"))
 num_images = len(all_images)
+all_images_inference = pd.read_csv(
+    "media/evaluate/BagNet/grading_task_test_inference.csv"
+)
+
+
+def get_image_title(image_name):
+    row = all_images_inference[all_images_inference["filename"] == image_name]
+    if row.pred.values[0] == 0:
+        return f"Our model predicted no signs of Onset 1 with {row.confidence.values[0] * 100:.2f}% confidence."
+    else:
+        return f"Our model predicted signs of Onset 1 with {row.confidence.values[0] * 100:.2f}% confidence."
+
+
 for i, img in enumerate(all_images):
     j = i + 1
     q1 = task.question_set.create(
         description=f"Q{j}/{num_images} [1/2]: Are there signs of diabetic retinopathy Onset 1?",
         image1=f"{img[6:]}",
+        image1_title=get_image_title(img[6:].split("/")[-1]),
         created_at=timezone.now(),
         slug=f"{alias}-q{j}p1",
     )
@@ -60,6 +75,7 @@ for i, img in enumerate(all_images):
         description=f"Q{j}/{num_images} [2/2]: How confident are you of the assigned grade?",
         created_at=timezone.now(),
         image1=f"{img[6:]}",
+        image1_title=get_image_title(img[6:].split("/")[-1]),
         slug=f"{alias}-q{j}p2",
     )
 

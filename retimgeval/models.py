@@ -35,22 +35,27 @@ class Question(models.Model):
     description = models.CharField(max_length=200)
 
     image1 = models.ImageField(upload_to="images/", blank=True, null=True)
+    image1_title = models.CharField(max_length=200, blank=True, null=True)
     image1_width = models.PositiveIntegerField(default=256)
     image1_height = models.PositiveIntegerField(default=256)
 
     image2 = models.ImageField(upload_to="images/", blank=True, null=True)
+    image2_title = models.CharField(max_length=200, blank=True, null=True)
     image2_width = models.PositiveIntegerField(default=256)
     image2_height = models.PositiveIntegerField(default=256)
 
     image3 = models.ImageField(upload_to="images/", blank=True, null=True)
+    image3_title = models.CharField(max_length=200, blank=True, null=True)
     image3_width = models.PositiveIntegerField(default=256)
     image3_height = models.PositiveIntegerField(default=256)
 
     image4 = models.ImageField(upload_to="images/", blank=True, null=True)
+    image4_title = models.CharField(max_length=200, blank=True, null=True)
     image4_width = models.PositiveIntegerField(default=256)
     image4_height = models.PositiveIntegerField(default=256)
 
     image5 = models.ImageField(upload_to="images/", blank=True, null=True)
+    image5_title = models.CharField(max_length=200, blank=True, null=True)
     image5_width = models.PositiveIntegerField(default=256)
     image5_height = models.PositiveIntegerField(default=256)
 

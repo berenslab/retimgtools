@@ -17,6 +17,18 @@
         {% if question.image5 %}<th>e</th>{% endif %}
     </tr>
 
+    {% elif "bagnet" in question.task.alias %}
+        {% if "no-support" in question.task.alias %}
+        <tr>
+            <th></th>
+        </tr>   
+        {% else %}
+        <tr>
+            <th>{{ question.image1_title }}</th>
+        </tr>     
+
+        {% endif %}
+
     {% else %}
 
         {% if question.image2 and not question.image4%}
