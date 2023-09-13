@@ -206,6 +206,43 @@
     }
 </style>
 <script>
+    // Function to apply the magnifier settings
+    const applyMagnifierSettings = () => {
+        magnifierSize = parseInt(magnifierSizeSelect.value);
+        zoomLevel = parseFloat(zoomLevelSelect.value);
+    
+        magnifierCanvases.forEach(magnifierCanvas => {
+            magnifierCanvas.width = magnifierSize;
+            magnifierCanvas.height = magnifierSize;
+        });
+    };
+
+    // Function to load settings
+    const loadSettings = () => {
+        if (localStorage.getItem("showCircleToggle") === "true") {
+            showCircleToggle.checked = true;
+        }
+        if (localStorage.getItem("magnifierSize")) {
+            magnifierSizeSelect.value = localStorage.getItem("magnifierSize");
+        }
+        if (localStorage.getItem("zoomLevel")) {
+            zoomLevelSelect.value = localStorage.getItem("zoomLevel");
+        }
+        // Apply the loaded settings
+        applyMagnifierSettings();
+    };
+
+    // Function to save settings
+    const saveSettings = () => {
+        localStorage.setItem("showCircleToggle", showCircleToggle.checked);
+        localStorage.setItem("magnifierSize", magnifierSizeSelect.value);
+        localStorage.setItem("zoomLevel", zoomLevelSelect.value);
+    };
+
+    // Load settings on page load
+    document.addEventListener('DOMContentLoaded', (event) => {
+        loadSettings();
+    });
 
     const form = document.querySelector("form");
 
@@ -258,6 +295,8 @@
     magnifierSizeSelect.addEventListener('change', function() {
 
         magnifierSize = parseInt(this.value);
+        saveSettings();
+        applyMagnifierSettings();
         magnifierCanvases.forEach(magnifierCanvas => {
             magnifierCanvas.width = magnifierSize;
             magnifierCanvas.height = magnifierSize;
@@ -268,6 +307,12 @@
     // Event listener for zoom level
     zoomLevelSelect.addEventListener('change', function() {
         zoomLevel = parseFloat(this.value);
+        saveSettings();
+        applyMagnifierSettings();
+    });
+
+    showCircleToggle.addEventListener('change', function() {
+        saveSettings();
     });
 
     const clearMagnifiers = () => {
