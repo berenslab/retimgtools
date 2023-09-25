@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load replace %}
 {% block title %}{{ question.description }}{% endblock title %}
 {% block content %}
 
@@ -61,7 +61,7 @@
                 {% if question.image1_title %}
                 <!-- Image title -->
                 <div class="ms-3">
-                    {{ question.image1_title | safe }}
+                    {{ question.image1_title | replace:"healthy, no DR" | safe}}
                 </div>
                 {% endif %}
             </div>
