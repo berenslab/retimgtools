@@ -118,16 +118,21 @@
   <form action="{{ question.get_absolute_url }}" method="POST">
     {% csrf_token %}
     {% for sub_question, form in sub_questions_and_forms %}
-      <div class="sub-question mt-3">
+    <div class="sub-question mt-3">
         <h4>{{ sub_question.description }}</h4>
+        {% if sub_question in unanswered_sub_questions %}
+        <div class="alert alert-danger">
+            This subquestion is not yet answered.
+        </div>
+        {% endif %}
         <div class="sub-question-form choices">
-          {% for choice in form.choice.field.choices %}
+        {% for choice in form.choice.field.choices %}
             <input class="me-1" type="radio" id="{{ choice.0 }}" name="{{ sub_question.id }}" value="{{ choice.0 }}">
             <label class="me-5" for="{{ choice.0 }}">{{ choice.1 }}</label>
-          {% endfor %}
+        {% endfor %}
         </div>
-      </div>
-      <br>
+    </div>
+    <br>
     {% endfor %}
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>

@@ -77,10 +77,14 @@ def question_detail(request, slug):
             return redirect("retimgeval:thank_you", alias=task.alias)
 
     sub_questions = SubQuestion.objects.filter(question=question)
+    context = {}
 
     if sub_questions.exists():
         # Handle SubQuestion logic
         if request.method == "POST":
+            valid_answers = []  # Collect valid answers here
+            unanswered_sub_questions = []
+
             for sub_question in sub_questions:
                 choice_id = request.POST.get(str(sub_question.id), None)
                 form_data = {"choice": choice_id}
@@ -95,46 +99,45 @@ def question_detail(request, slug):
                     answer.question = question
                     answer.sub_question = sub_question
                     answer.user = request.user
-                    answer.save()
+                    valid_answers.append(answer)
                 else:
-                    print(
-                        f"Form is not valid for sub_question {sub_question.id}: {form.errors}"
-                    )
-                    return render(
-                        request,
-                        "retimgeval/question_detail.html",
-                        {"form_errors": form.errors},
-                    )
+                    unanswered_sub_questions.append(sub_question)
 
-            next_question = get_next_unanswered_question(request, task)
-            if next_question:
-                return redirect("retimgeval:question_detail", slug=next_question.slug)
+            if len(valid_answers) == sub_questions.count():
+                for answer in valid_answers:
+                    answer.save()
+
+                next_question = get_next_unanswered_question(request, task)
+                if next_question:
+                    return redirect(
+                        "retimgeval:question_detail", slug=next_question.slug
+                    )
+                else:
+                    return redirect("retimgeval:thank_you", alias=task.alias)
             else:
-                return redirect("retimgeval:thank_you", alias=task.alias)
+                context["unanswered_sub_questions"] = unanswered_sub_questions
 
-        else:
-            sub_questions_and_forms = []
-            for sub_question in sub_questions:
-                form = AnswerForm()
-                form.fields["choice"].queryset = sub_question.choice_set.all()
-                sub_questions_and_forms.append((sub_question, form))
+        sub_questions_and_forms = []
+        for sub_question in sub_questions:
+            form = AnswerForm()
+            form.fields["choice"].queryset = sub_question.choice_set.all()
+            sub_questions_and_forms.append((sub_question, form))
 
-        context = {
-            "question": question,
-            "sub_questions_and_forms": sub_questions_and_forms,
-            "reaction_time": request.GET.get("reaction_time", None),
-            "delay_time": request.GET.get("delay_time", None),
-        }
+        context.update(
+            {
+                "question": question,
+                "sub_questions_and_forms": sub_questions_and_forms,
+                "reaction_time": request.GET.get("reaction_time", None),
+                "delay_time": request.GET.get("delay_time", None),
+            }
+        )
 
     else:
         # Handle original Question logic
         choices = question.choice_set.all()
         if request.method == "POST":
             form = AnswerForm(request.POST)
-            form.question = question
-            form.fields["choice"].queryset = Choice.objects.filter(
-                question_id=form.question.pk
-            )
+            form.fields["choice"].queryset = choices
 
             if form.is_valid():
                 option = form.save(commit=False)
@@ -152,23 +155,19 @@ def question_detail(request, slug):
                     )
                 else:
                     return redirect("retimgeval:thank_you", alias=task.alias)
-
         else:
             form = AnswerForm()
-            form.question = question
-            form.fields["choice"].queryset = Choice.objects.filter(
-                question_id=form.question.pk
-            )
-            print(Choice.objects.filter(question_id=form.question.pk))
-            print(form)
+            form.fields["choice"].queryset = choices
 
-        context = {
-            "question": question,
-            "choices": choices,
-            "form": form,
-            "reaction_time": request.GET.get("reaction_time", None),
-            "delay_time": request.GET.get("delay_time", None),
-        }
+        context.update(
+            {
+                "question": question,
+                "choices": choices,
+                "form": form,
+                "reaction_time": request.GET.get("reaction_time", None),
+                "delay_time": request.GET.get("delay_time", None),
+            }
+        )
 
     return render(request, "retimgeval/question_detail.html", context)
 

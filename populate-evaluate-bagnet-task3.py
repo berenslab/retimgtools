@@ -46,7 +46,7 @@ all_images_inference = pd.read_csv(
 def get_image_title(image_name):
     row = all_images_inference[all_images_inference["filename"] == image_name]
     if row.pred.values[0] == 0:
-        return f"AI model predicts:<br><strong>healthy</strong> ({row.confidence.values[0] * 100:.0f}% confidence)."
+        return f"AI model predicts:<br><strong>no DR</strong> ({row.confidence.values[0] * 100:.0f}% confidence)."
     else:
         return f"AI model predicts:<br><strong>DR</strong> ({row.confidence.values[0] * 100:.0f}% confidence)."
 
