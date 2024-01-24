@@ -156,30 +156,25 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Retrieve magnifier settings from local storage
+        // Retrieve magnifier settings from local storage or use defaults from the HTML
         let savedMagnifierSize = localStorage.getItem('magnifierSize');
         let savedZoomLevel = localStorage.getItem('zoomLevel');
-        let savedMagnifierFixed = localStorage.getItem('magnifierFixed') === 'true';
-        let savedShowCircle = localStorage.getItem('showCircle') === 'true';
-    
+        let savedMagnifierFixed = localStorage.getItem('magnifierFixed');
+        let savedShowCircle = localStorage.getItem('showCircle');
 
-        // Apply saved magnifier size if it exists
-        if (savedMagnifierSize) {
-            magnifierSize = parseInt(savedMagnifierSize);
-            magnifierCanvas.width = magnifierSize;
-            magnifierCanvas.height = magnifierSize;
-            magnifierSizeSelect.value = savedMagnifierSize; // Update the select dropdown
-        }
+        // Apply saved or default magnifier size
+        magnifierSize = savedMagnifierSize ? parseInt(savedMagnifierSize) : parseInt(magnifierSizeSelect.value);
+        magnifierCanvas.width = magnifierSize;
+        magnifierCanvas.height = magnifierSize;
+        magnifierSizeSelect.value = magnifierSize.toString(); // Ensure select reflects the current setting
 
-        // Apply saved zoom level if it exists
-        if (savedZoomLevel) {
-            zoomLevel = parseFloat(savedZoomLevel);
-            zoomLevelSelect.value = savedZoomLevel; // Update the select dropdown
-        }
+        // Apply saved or default zoom level
+        zoomLevel = savedZoomLevel ? parseFloat(savedZoomLevel) : parseFloat(zoomLevelSelect.value);
+        zoomLevelSelect.value = zoomLevel.toString(); // Ensure select reflects the current setting
 
-        // Apply saved toggle states if they exist
-        magnifierToggle.checked = savedMagnifierFixed;
-        showCircleToggle.checked = savedShowCircle;
+        // Apply saved or default toggle states; check for null to distinguish between false and not set
+        magnifierToggle.checked = savedMagnifierFixed !== null ? (savedMagnifierFixed === 'true') : magnifierToggle.checked;
+        showCircleToggle.checked = savedShowCircle !== null ? (savedShowCircle === 'true') : showCircleToggle.checked;
 
 
         // Ensure the canvas and magnifier are initialized correctly
