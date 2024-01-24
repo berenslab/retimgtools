@@ -31,11 +31,20 @@
     Your annotations will be saved on a secure server in the EU and will be used to assess the quality of the disease prediction of an AI algorithm. Also, mouse movements will be tracked as long as the cursor is above the image. If you have additional questions, do not hesitate to ask. No personal information will be disclosed at any time. Please check "consent" below if you agree to these terms.
 </p>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Start Annotation</button>
-</form>
+
+    {% if show_consent_form %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Consent and Start Annotation</button>
+        </form>
+    {% else %}
+        <form action="{% url 'retimgann:task_selection' task_id=task.id %}" method="post">
+            {% csrf_token %}
+            <!-- You can include a hidden field for task_id if needed, or any other data -->
+            <button type="submit" class="btn btn-primary">Start Annotation</button>
+        </form>
+    {% endif %}
 
 {% else %}
 

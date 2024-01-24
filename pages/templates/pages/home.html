@@ -51,10 +51,10 @@
 </div>
 <ul class="list-group">
   {% for task in annotation_tasks %}
-    {% if "bagnet" in task.category %}
+    {% if "bagnet" in task.category or "annotate" in task.category %}
       <li class="list-group-item">
         {% if task.is_active %}
-        <a href="{% url 'retimgann:task_selection' task.id %}" class="text-decoration-none">{{ task.title }}</a> (active)
+        <a href="{% url 'retimgann:task_instruction' task.id %}" class="text-decoration-none">{{ task.title }}</a> (active)
         {% else %}
         <span>{{ task.title }} (inactive)</span>
         {% endif %}

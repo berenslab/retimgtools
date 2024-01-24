@@ -1,7 +1,7 @@
 import json
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -31,6 +31,47 @@ class LandingPageView(CreateView):
         form.instance.user = self.request.user
         form.save()
         return redirect("retimgann:annotation_page", image_id=1)
+
+
+def task_instruction(request, task_id):
+    task = get_object_or_404(Task, id=task_id)
+    show_consent_form = True  # Default to showing the form
+    consent_form = ConsentForm(request.POST or None)
+
+    if request.user.is_authenticated:
+        # Check if consent already given for this task
+        existing_consent = Consent.objects.filter(
+            user=request.user, consented=True
+        ).exists()
+        if existing_consent:
+            show_consent_form = (
+                False  # User has consented, so do not show the form again
+            )
+
+    if request.method == "POST":
+        if consent_form.is_valid():
+            # Assuming your Consent model has a 'task' field to link consent to specific tasks
+            consent = consent_form.save(commit=False)
+            consent.user = request.user
+            consent.task = task
+            consent.save()
+
+            # Redirect to the task selection view, which will then redirect to the annotation page
+            return HttpResponseRedirect(
+                reverse("retimgann:task_selection", args=[task.id])
+            )
+
+    context = {
+        "task": task,
+        "form": consent_form,
+        "show_consent_form": show_consent_form,
+    }
+
+    if task.id == 1:
+        return render(request, "retimgann/task_instruction_1.html", context)
+    elif task.id == 2:
+        return render(request, "retimgann/task_instruction_2.html", context)
+    # Add more conditions if there are more tasks
 
 
 def annotate(request, task_id, image_id):
@@ -112,7 +153,8 @@ def annotate_submit(request):
 
         task_id = request.POST.get("task_id")
         image_id = request.POST.get("image_id")
-        image = Image.objects.get(index=image_id)
+        print(task_id, image_id)
+        image = Image.objects.get(index=image_id, task=task_id)
         annotation, created = Annotation.objects.get_or_create(
             user=request.user,
             image=image,
@@ -130,7 +172,7 @@ def annotate_submit(request):
             annotation.save()
         try:
             return redirect(
-                "retimgann:annotate", task_id=task_id, image_id=image_id + 1
+                "retimgann:annotate", task_id=task_id, image_id=int(image_id) + 1
             )
         except ObjectDoesNotExist:
             return redirect("retimgann:thank_you")
@@ -141,14 +183,27 @@ def annotate_submit(request):
 
 def task_selection(request, task_id):
     task = get_object_or_404(Task, id=task_id)
-    first_image = Image.objects.filter(task=task).order_by("index").first()
 
-    if first_image:
-        # Redirect to the annotation page with the task_id and the first image's index
+    # Find the first image associated with the task that does not have an annotation by this user
+    annotated_image_ids = Annotation.objects.filter(
+        user=request.user, image__task=task
+    ).values_list("image_id", flat=True)
+
+    first_unannotated_image = (
+        Image.objects.filter(task=task)
+        .exclude(id__in=annotated_image_ids)
+        .order_by("index")
+        .first()
+    )
+
+    if first_unannotated_image:
+        # Redirect to the annotation page with the task_id and the first unannotated image's index
         return redirect(
-            "retimgann:annotate", task_id=task.id, image_id=first_image.index
+            "retimgann:annotate",
+            task_id=task.id,
+            image_id=first_unannotated_image.index,
         )
-    else:
+    else:       
         # Handle the case where there are no images for the task
         # Maybe redirect to a page that indicates this or shows an error message
         return render(request, "retimgann/thank_you.html")
