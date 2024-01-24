@@ -122,18 +122,34 @@
         <br/>
         <div class="instruction">
             <h6>Instruction</h6>
-            <p>
-                Your task is to annotate lesions related to Diabetic Retinopathy on fundus images. By moving the mouse over the image, you get a magnified cutout of the image in the small window below. All images are from patients with DR of grade 0 ("no DR"), grade 1 ("mild DR") and grade 2 ("moderate DR"). For best contrast, you may need to adjust the brightness of your monitor to maximal.
-            </p>
-            <p>
-                To mark a lesion, select the type of lesion on the right. You can annotate microaneurysms (MA), hemorraghes (HE), exudates (EX), soft exudates (SE), artefacts or other lesions. You add a lesion marker to the image by clicking on the image. You can also highlight or remove a lesion again by clicking the respective button in the panel in the top right.
-            </p>
-            <p>
-                Make sure you work carefully and annotate all lesions that are present. When you are done with an image, click "submit". The annotations will be saved.                
-            </p>
-            <p>
-                If you need to interrupt a session, we will load the images and corresponding annotations that you have already submitted.               
-            </p>
+            {% if task.category == "bagnet-fundus" %}
+                <p>
+                    Your task is to annotate lesions related to Diabetic Retinopathy on fundus images. By moving the mouse over the image, you get a magnified cutout of the image in the small window below. All images are from patients with DR of grade 0 ("no DR"), grade 1 ("mild DR") and grade 2 ("moderate DR"). For best contrast, you may need to adjust the brightness of your monitor to maximal.
+                </p>
+                <p>
+                    To mark a lesion, select the type of lesion on the right. You can annotate microaneurysms (MA), hemorraghes (HE), exudates (EX), soft exudates (SE), artefacts or other lesions. You add a lesion marker to the image by clicking on the image. You can also highlight or remove a lesion again by clicking the respective button in the panel in the top right.
+                </p>
+                <p>
+                    Make sure you work carefully and annotate all lesions that are present. When you are done with an image, click "submit". The annotations will be saved.                
+                </p>
+                <p>
+                    If you need to interrupt a session, we will load the images and corresponding annotations that you have already submitted.               
+                </p>           
+            {% elif task.category == "annotate-oct" %}
+                <p>
+                    Your task is to annotate lesions related to Drusen on OCT images. By moving the mouse over the image, you get a magnified cutout of the image in the small window below. All images are from patients with Drusen. For best contrast, you may need to adjust the brightness of your monitor to maximal.
+                </p>
+                <p>
+                    To mark a lesion, select the type of lesion on the right. You can annotate Drusen (Drusen). You add a lesion marker to the image by clicking on the image. You can also highlight or remove a lesion again by clicking the respective button in the panel in the top right.
+                </p>
+                <p>
+                    Make sure you work carefully and annotate all lesions that are present. When you are done with an image, click "submit". The annotations will be saved.
+                </p>
+                <p>
+                    If you need to interrupt a session, we will load the images and corresponding annotations that you have already submitted.
+                </p>
+            {% endif %}
+
         </div>
     </div>
 </div>
