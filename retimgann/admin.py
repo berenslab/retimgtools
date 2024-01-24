@@ -1,7 +1,7 @@
 from csvexport.actions import csvexport
 from django.contrib import admin
 
-from .models import Annotation, Consent, Image
+from .models import Annotation, Consent, Image, Task
 
 
 @admin.register(Consent)
@@ -11,7 +11,20 @@ class ConsentAdmin(admin.ModelAdmin):
 
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
-    list_display = ["index", "image", "name"]
+    list_display = ["task", "index", "image", "name"]
+
+
+@admin.register(Task)
+class TaskAdmin(admin.ModelAdmin):
+    list_display = [
+        "title",
+        "description",
+        "category",
+        "is_active",
+        "created_at",
+        "updated_at",
+        "alias",
+    ]
 
 
 class AnnotationAdmin(admin.ModelAdmin):

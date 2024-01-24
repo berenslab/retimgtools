@@ -9,3 +9,5 @@
 !*/migrations/__init__.py
 
 *media/
+
+*backup*
