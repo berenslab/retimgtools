@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Drusen annotation for OCT{% endblock title %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+
+<h1>Drusen annotation for OCT</h1>
+
+<h2>Instructions</h2>
+
+<p>
+    Your task is to annotate lesions related to Drusen on OCT images. By moving the mouse over the image, you get a magnified cutout of the image in the small window below. All images are from patients with Drusen. For best contrast, you may need to adjust the brightness of your monitor to maximal.
+</p>
+<p>
+    To mark a lesion, select the type of lesion on the right. You can annotate Drusen (Drusen). You add a lesion marker to the image by clicking on the image. You can also highlight or remove a lesion again by clicking the respective button in the panel in the top right.
+</p>
+<p>
+    Make sure you work carefully and annotate all lesions that are present. When you are done with an image, click "submit". The annotations will be saved.
+</p>
+<p>
+    If you need to interrupt a session, we will load the images and corresponding annotations that you have already submitted.
+</p>
+
+
+<h2>Information about the study</h2>
+
+<p>
+    Your annotations will be saved on a secure server in the EU and will be used to assess the quality of the disease prediction of an AI algorithm. Also, mouse movements will be tracked as long as the cursor is above the image. If you have additional questions, do not hesitate to ask. No personal information will be disclosed at any time. Please check "consent" below if you agree to these terms.
+</p>
+
+    {% if show_consent_form %}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Consent and Start Annotation</button>
+        </form>
+    {% else %}
+        <form action="{% url 'retimgann:task_selection' task_id=task.id %}" method="post">
+            {% csrf_token %}
+            <!-- You can include a hidden field for task_id if needed, or any other data -->
+            <button type="submit" class="btn btn-primary">Start Annotation</button>
+        </form>
+    {% endif %}
+
+
+{% else %}
+
+<p>You are not logged in yet.</p>
+
+{% endif %}
+
+{% endblock content %}

@@ -6,7 +6,11 @@
 
 {% if user.is_authenticated %}
 
+{% if task.alias == "bagnet-fundus" %}
 <h1>Lesion annotation for diabetic retinopathy (DR)</h1>
+{% elif task.alias == "annotate-oct"%}
+<h1>Drusen annotation for OCT</h1>
+{% endif %}
 <div class="row">
     <h4>Annotating image {{ image.index }} / {{ total_num_images }}</h4>
     <div class="col">
@@ -57,9 +61,13 @@
         <div id="print_coordinates"></div>
         <br/>
         <h5>Labels</h5>
-        <form id="annotationForm" method="post">
+
+        <form id="annotationForm" method="post" action="{% url 'retimgann:annotate_submit' %}">
             {% csrf_token %}
+            <input type="hidden" name="task_id" value="{{ task.id }}">
+            <input type="hidden" name="image_id" value="{{ image.index }}">
             <div id="labels">
+                {% if task.category == "bagnet-fundus" %}
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="label" id="labelMA" value="MA">
                     <label class="form-check-label" for="labelMA">
@@ -100,36 +108,96 @@
                     </label>
                     <input type="text" id="otherLabelInput" style="display: none;">
                 </div>
+                {% elif task.category == "annotate-oct" %}
+                <div class="form-check">
+                    <input class="form-check-input acti" type="radio" name="label" id="labelDS" value="DS" checked>
+                    <label class="form-check-label" for="labelDS">
+                        <div style="color:red; float: left">&#9632;</div>&nbsp;Drusen
+                    </label>
+                </div>
+                {% endif %}
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
         <br/>
         <div class="instruction">
             <h6>Instruction</h6>
-            <p>
-                Your task is to annotate lesions related to Diabetic Retinopathy on fundus images. By moving the mouse over the image, you get a magnified cutout of the image in the small window below. All images are from patients with DR of grade 0 ("no DR"), grade 1 ("mild DR") and grade 2 ("moderate DR"). For best contrast, you may need to adjust the brightness of your monitor to maximal.
-            </p>
-            <p>
-                To mark a lesion, select the type of lesion on the right. You can annotate microaneurysms (MA), hemorraghes (HE), exudates (EX), soft exudates (SE), artefacts or other lesions. You add a lesion marker to the image by clicking on the image. You can also highlight or remove a lesion again by clicking the respective button in the panel in the top right.
-            </p>
-            <p>
-                Make sure you work carefully and annotate all lesions that are present. When you are done with an image, click "submit". The annotations will be saved.                
-            </p>
-            <p>
-                If you need to interrupt a session, we will load the images and corresponding annotations that you have already submitted.               
-            </p>
+            {% if task.category == "bagnet-fundus" %}
+                <p>
+                    Your task is to annotate lesions related to Diabetic Retinopathy on fundus images. By moving the mouse over the image, you get a magnified cutout of the image in the small window below. All images are from patients with DR of grade 0 ("no DR"), grade 1 ("mild DR") and grade 2 ("moderate DR"). For best contrast, you may need to adjust the brightness of your monitor to maximal.
+                </p>
+                <p>
+                    To mark a lesion, select the type of lesion on the right. You can annotate microaneurysms (MA), hemorraghes (HE), exudates (EX), soft exudates (SE), artefacts or other lesions. You add a lesion marker to the image by clicking on the image. You can also highlight or remove a lesion again by clicking the respective button in the panel in the top right.
+                </p>
+                <p>
+                    Make sure you work carefully and annotate all lesions that are present. When you are done with an image, click "submit". The annotations will be saved.                
+                </p>
+                <p>
+                    If you need to interrupt a session, we will load the images and corresponding annotations that you have already submitted.               
+                </p>           
+            {% elif task.category == "annotate-oct" %}
+                <p>
+                    Your task is to annotate lesions related to Drusen on OCT images. By moving the mouse over the image, you get a magnified cutout of the image in the small window below. All images are from patients with Drusen. For best contrast, you may need to adjust the brightness of your monitor to maximal.
+                </p>
+                <p>
+                    To mark a lesion, select the type of lesion on the right. You can annotate Drusen (Drusen). You add a lesion marker to the image by clicking on the image. You can also highlight or remove a lesion again by clicking the respective button in the panel in the top right.
+                </p>
+                <p>
+                    Make sure you work carefully and annotate all lesions that are present. When you are done with an image, click "submit". The annotations will be saved.
+                </p>
+                <p>
+                    If you need to interrupt a session, we will load the images and corresponding annotations that you have already submitted.
+                </p>
+            {% endif %}
+
         </div>
     </div>
 </div>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Retrieve magnifier settings from local storage
+        let savedMagnifierSize = localStorage.getItem('magnifierSize');
+        let savedZoomLevel = localStorage.getItem('zoomLevel');
+        let savedMagnifierFixed = localStorage.getItem('magnifierFixed') === 'true';
+        let savedShowCircle = localStorage.getItem('showCircle') === 'true';
+    
+
+        // Apply saved magnifier size if it exists
+        if (savedMagnifierSize) {
+            magnifierSize = parseInt(savedMagnifierSize);
+            magnifierCanvas.width = magnifierSize;
+            magnifierCanvas.height = magnifierSize;
+            magnifierSizeSelect.value = savedMagnifierSize; // Update the select dropdown
+        }
+
+        // Apply saved zoom level if it exists
+        if (savedZoomLevel) {
+            zoomLevel = parseFloat(savedZoomLevel);
+            zoomLevelSelect.value = savedZoomLevel; // Update the select dropdown
+        }
+
+        // Apply saved toggle states if they exist
+        magnifierToggle.checked = savedMagnifierFixed;
+        showCircleToggle.checked = savedShowCircle;
+
+
+        // Ensure the canvas and magnifier are initialized correctly
+        img.src = '{{ image.image.url }}';
+        img.onload = function() {
+            ctx.drawImage(img, 0, 0, 512, 512);
+            loadExistingCoordinates();
+        };
+    });
+
     const colors = {
         "MA": "red",
         "HE": "blue",
         "EX": "green",
         "SE": "yellow",
         "ARTEFACT": "purple",
-        "OTHER": "black"
+        "OTHER": "black",
+        "DS": "red",
     };
 
     const canvas = document.getElementById('imageCanvas');
@@ -145,6 +213,13 @@
     let fixedX = 0;
     let fixedY = canvas.height;
     let selectedLabel = null;
+    // Check if there is a radio button that is checked by default
+    let checkedRadioButton = document.querySelector('input[name="label"]:checked');
+
+    if (checkedRadioButton) {
+        // If there is, set selectedLabel to the value of that radio button
+        selectedLabel = checkedRadioButton.value;
+    }
     let coordinates = [];
     let lastHighlightedDot = null;
     let lastHighlightedDotImage = null; // Stores the image data before drawing highlight
@@ -166,11 +241,27 @@
         magnifierSize = parseInt(this.value);
         magnifierCanvas.width = magnifierSize;
         magnifierCanvas.height = magnifierSize;
+        // Save the new magnifier size to local storage
+        localStorage.setItem('magnifierSize', magnifierSize);
     });
 
     // Event listener for zoom level
     zoomLevelSelect.addEventListener('change', function() {
         zoomLevel = parseFloat(this.value);
+        // Save the new zoom level to local storage
+        localStorage.setItem('zoomLevel', zoomLevel);
+    });
+
+    // Event listener for magnifier fixed position toggle
+    magnifierToggle.addEventListener('change', function() {
+        // Save the new state to local storage
+        localStorage.setItem('magnifierFixed', magnifierToggle.checked);
+    });
+
+    // Event listener for show circle toggle
+    showCircleToggle.addEventListener('change', function() {
+        // Save the new state to local storage
+        localStorage.setItem('showCircle', showCircleToggle.checked);
     });
 
     document.querySelectorAll('input[name="label"]').forEach((radio) => {
@@ -296,7 +387,7 @@
             return {label: coordinate.label, x: coordinate.x, y: coordinate.y, color: coordinate.color};
         });
 
-        let existingMouseTrajectory = JSON.parse('{{ existing_mouse_trajectory }}');
+        let existingMouseTrajectory = JSON.parse('{{ existing_mouse_trajectory|escapejs }}');
         let totalMouseTrajectory = existingMouseTrajectory.concat(mouse_trajectory);
         
 
@@ -382,6 +473,7 @@
             magnifierCanvas.style.position = 'static';  // or 'relative', based on the original setting
             magnifierCanvas.style.left = '';
             magnifierCanvas.style.top = '';
+
         } else {
             // If checkbox is not checked, move the magnifier with the mouse
             magnifierCanvas.style.position = 'fixed';
@@ -521,10 +613,15 @@
 
     function loadExistingCoordinates() {
         let existingAnnotationsString = '{{ existing_annotation|escapejs|safe }}';
-        // Replace \u0027 with "
-        existingAnnotationsString = existingAnnotationsString.replace(/\\u0027/g, '"');
-        const existingAnnotations = JSON.parse(existingAnnotationsString);
-        console.log('existingAnnotations: ', existingAnnotations);  // This should show your annotation data
+        // Ensure the string is parsed into an array of objects
+        // First decode: removes the outermost encoding and backslashes before quotes
+        let decodedString = JSON.parse(existingAnnotationsString);
+
+        // Second decode: parses the JSON-formatted string into an actual JavaScript object (array of objects in this case)
+        const existingAnnotations = JSON.parse(decodedString);
+        console.log('existingAnnotations:', existingAnnotations);
+        console.log('existingAnnotations.length:', existingAnnotations.length); // This should now log the correct array length
+    
         for (let i = 0; i < existingAnnotations.length; i++) {
             const annotation = existingAnnotations[i];
             const label = annotation.label;
@@ -628,7 +725,6 @@
     canvas.addEventListener('mouseleave', function() {
         clearInterval(mouseInterval);
     });
-
 </script>
 
 

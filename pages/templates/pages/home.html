@@ -15,7 +15,7 @@
 </div>
 
 <ul class="list-group">
-  {% for task in tasks %}
+  {% for task in evalutation_tasks %}
     {% if task.category == "realism-fundus" %}
       <li class="list-group-item">
         {% if task.is_active %}
@@ -33,7 +33,7 @@
 </div>
 
 <ul class="list-group">
-  {% for task in tasks %}
+  {% for task in evalutation_tasks %}
     {% if task.category == "realism-oct" %}
       <li class="list-group-item">
         {% if task.is_active %}
@@ -50,10 +50,18 @@
   <h2 class="d-inline-block me-3">Decision support through sparse BagNets</h2>
 </div>
 <ul class="list-group">
-  <li class="list-group-item">
-    <a href="/annotate" class="text-decoration-none">Lesion annotation for diabetic retinopathy (DR)</a> (active)
-  </li>
-  {% for task in tasks %}
+  {% for task in annotation_tasks %}
+    {% if "bagnet" in task.category or "annotate" in task.category %}
+      <li class="list-group-item">
+        {% if task.is_active %}
+        <a href="{% url 'retimgann:task_instruction' task.id %}" class="text-decoration-none">{{ task.title }}</a> (active)
+        {% else %}
+        <span>{{ task.title }} (inactive)</span>
+        {% endif %}
+      </li> 
+    {% endif %}
+  {% endfor %}
+  {% for task in evalutation_tasks %}
     {% if "bagnet" in task.category %}
       <li class="list-group-item">
         {% if task.is_active %}
