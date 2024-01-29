@@ -1,7 +1,7 @@
 from csvexport.actions import csvexport
 from django.contrib import admin
 
-from .models import Answer, Choice, Consent, Question, Task
+from .models import Answer, Choice, Consent, Question, SubQuestion, Task
 
 
 # Register your models here.
@@ -46,7 +46,24 @@ class TaskAdmin(admin.ModelAdmin):
     search_fields = ("description", "category")
 
 
+class QuestionAdmin(admin.ModelAdmin):
+    list_display = ("description", "task", "created_at")
+    list_filter = ("task", "created_at")
+    search_fields = ("description", "task")
+
+    inlines = [ChoiceInline]
+
+
+class SubQuestionAdmin(admin.ModelAdmin):
+    list_display = ("description", "question", "created_at")
+    list_filter = ("question", "created_at")
+    search_fields = ("description", "question")
+
+    inlines = [ChoiceInline]
+
+
 admin.site.register(Task, TaskAdmin)
-admin.site.register(Question)
+admin.site.register(Question, QuestionAdmin)
+admin.site.register(SubQuestion, SubQuestionAdmin)
 admin.site.register(Choice, ChoiceAdmin)
 admin.site.register(Answer, AnswerAdmin)

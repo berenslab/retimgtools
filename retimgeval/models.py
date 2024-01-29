@@ -65,21 +65,21 @@ class Question(models.Model):
         return self.description
 
     def save(self, *args, **kwargs):
-        if self.image1:
+        if self.image1 and not self.image1_width:
             image1 = PilImage.open(self.image1.path)
             self.image1_width, self.image1_height = image1.size
-        if self.image2:
+        if self.image2 and not self.image2_width:
             image2 = PilImage.open(self.image2.path)
             self.image2_width, self.image2_height = image2.size
-        if self.image3:
+        if self.image3 and not self.image3_width:
             image3 = PilImage.open(self.image3.path)
             self.image3_width, self.image3_height = image3.size
 
-        if self.image4:
+        if self.image4 and not self.image4_width:
             image4 = PilImage.open(self.image4.path)
             self.image4_width, self.image4_height = image4.size
 
-        if self.image5:
+        if self.image5 and not self.image5_width:
             image5 = PilImage.open(self.image5.path)
             self.image5_width, self.image5_height = image5.size
 

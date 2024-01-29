@@ -6,7 +6,7 @@
 
 {% if user.is_authenticated %}
 
-<div class="mb-2">
+{% comment %} <div class="mb-2">
   <h2 class="d-inline-block me-3">Decision support through AI-generated images</h2>
 </div>
 
@@ -44,7 +44,7 @@
       </li>
     {% endif %}
   {% endfor %}
-</ul>
+</ul> {% endcomment %}
 
 <div class="mt-4">
   <h2 class="d-inline-block me-3">Decision support through sparse BagNets</h2>
@@ -62,7 +62,16 @@
     {% endif %}
   {% endfor %}
   {% for task in evalutation_tasks %}
-    {% if "bagnet" in task.category %}
+    {% comment %} {% if "bagnet" in task.category %}
+      <li class="list-group-item">
+        {% if task.is_active %}
+          <a href="{% url 'retimgeval:task_instruction' task.alias %}" class="text-decoration-none">{{ task.description }}</a> (active)
+        {% else %}
+          <span>{{ task.description }} (inactive)</span>
+        {% endif %}
+      </li>
+    {% endif %} {% endcomment %}
+    {% if task.category == "erm-oct" %}
       <li class="list-group-item">
         {% if task.is_active %}
           <a href="{% url 'retimgeval:task_instruction' task.alias %}" class="text-decoration-none">{{ task.description }}</a> (active)

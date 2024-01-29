@@ -156,6 +156,23 @@
     </ul>
     {% endif %}
 
+    {% if task.alias == "erm-oct" %}
+    <h1>
+        ERM Detection for OCT
+    </h1>
+    <h3>
+        Instruction
+    </h3>
+    <ul>
+        <li>
+            You will be shown 37 OCT images, with corresponding heatmaps created by our model and with magnified patches extracted from the heatmpas. 
+        </li>
+        <li>
+            These images are either healthy or contain ERMs. Your task is to select whether you agree with the heatmaps overlaid on the OCT images.
+        </li>
+    </ul>
+    {% endif %}
+
     {% if not already_consented %}
         <form method="post">
             <h3>Information about the study</h3>

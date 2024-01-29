@@ -9,14 +9,13 @@
 
 <table>
     {% if question.task.alias == "realism-fundus" or question.task.alias == "realism-oct" %}
-    <tr>
-        {% if question.image1 %}<th>a</th>{% endif %}
-        {% if question.image2 %}<th>b</th>{% endif %}
-        {% if question.image3 %}<th>c</th>{% endif %}
-        {% if question.image4 %}<th>d</th>{% endif %}
-        {% if question.image5 %}<th>e</th>{% endif %}
-    </tr>
-
+        <tr>
+            {% if question.image1 %}<th>a</th>{% endif %}
+            {% if question.image2 %}<th>b</th>{% endif %}
+            {% if question.image3 %}<th>c</th>{% endif %}
+            {% if question.image4 %}<th>d</th>{% endif %}
+            {% if question.image5 %}<th>e</th>{% endif %}
+        </tr>
     {% elif "bagnet" in question.task.alias %}
         {% if "no-support" in question.task.alias %}
         <tr>
@@ -26,11 +25,8 @@
         <tr>
             <th></th>
         </tr>     
-
         {% endif %}
-
     {% else %}
-
         {% if question.image2 and not question.image4%}
             <tr>
                 {% if question.image1 %}<th>Better</th>{% endif %}
@@ -41,7 +37,6 @@
         <tr>
             <th></th>
         </tr>            
-        
         {% endif %}
 
     {% endif %}
@@ -54,7 +49,7 @@
                 <div>
                     <canvas class="imageCanvas" width="{{ question.image1_width }}" height="{{ question.image1_height }}" data-src="{{ question.image1.url }}"></canvas>
                     <div>
-                        <canvas class="magnifierCanvas" width="100" height="100" style="{% if not 'grading' in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+                        <canvas class="magnifierCanvas" width="100" height="100" style="border:1px solid #d3d3d3"></canvas>
                     </div>
                 </div>
                 
@@ -153,12 +148,7 @@
   </form>
 {% endif %}
 
-{% if "grading" in question.task.alias %}
 <div class="mt-4 mb-5">
-{% else %}
-<div class="mt-4 mb-5" style="display: none;">
-{% endif %}
-    
     <h5>Options for magnifiers</h5>
     <div class="row">
         <div class="col">
