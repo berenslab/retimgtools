@@ -37,9 +37,7 @@ class AnnotationAdmin(admin.ModelAdmin):
         "created_at",
         "updated_at",
     ]
-    list_filter = [
-        "user",
-    ]
+    list_filter = ["user", "image__task"]
 
     def mouse_trajectory_summary(self, obj):
         last_positions = obj.mouse_trajectory[-200:]
