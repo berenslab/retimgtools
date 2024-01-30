@@ -27,7 +27,11 @@
                         <ul class="dropdown-menu text-small" aria-labelledby="dropdownUser1">
                             <li><a class="dropdown-item" href="{% url 'accounts:detail' user.username %}">Profile </a></li>
                             <li><a class="dropdown-item" href="{% url 'password_change'%}">Change password</a></li>
-                            <li><a class="dropdown-item" href="{% url 'logout' %}">Log Out</a>
+                            <li>
+                                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item" style="border: none; background: none;">Log Out</button>
+                                </form>
                             </li>
                         </ul>
                     </div>

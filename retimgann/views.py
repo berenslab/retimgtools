@@ -1,5 +1,7 @@
 import json
 
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -11,7 +13,7 @@ from .forms import AnnotationForm, ConsentForm
 from .models import Annotation, Consent, Image, Task
 
 
-class LandingPageView(CreateView):
+class LandingPageView(LoginRequiredMixin, CreateView):
     model = Consent
     form_class = ConsentForm
     template_name = "retimgann/landing_page.html"
@@ -33,6 +35,7 @@ class LandingPageView(CreateView):
         return redirect("retimgann:annotation_page", image_id=1)
 
 
+@login_required
 def task_instruction(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     show_consent_form = True  # Default to showing the form
@@ -74,6 +77,7 @@ def task_instruction(request, task_id):
     # Add more conditions if there are more tasks
 
 
+@login_required
 def annotate(request, task_id, image_id):
     task = get_object_or_404(Task, id=task_id)  # Get the task
     images = Image.objects.filter(task=task).order_by(
@@ -142,6 +146,7 @@ def annotate(request, task_id, image_id):
     )
 
 
+@login_required
 def annotate_submit(request):
     if request.method == "POST":
         # Annotation form submitted
@@ -181,6 +186,7 @@ def annotate_submit(request):
     return redirect("home")
 
 
+@login_required
 def task_selection(request, task_id):
     task = get_object_or_404(Task, id=task_id)
 
@@ -203,11 +209,12 @@ def task_selection(request, task_id):
             task_id=task.id,
             image_id=first_unannotated_image.index,
         )
-    else:       
+    else:
         # Handle the case where there are no images for the task
         # Maybe redirect to a page that indicates this or shows an error message
         return render(request, "retimgann/thank_you.html")
 
 
+@login_required
 def thank_you(request):
     return render(request, "retimgann/thank_you.html")

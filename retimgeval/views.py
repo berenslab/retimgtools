@@ -1,3 +1,5 @@
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -7,7 +9,7 @@ from .forms import AnswerForm, ConsentForm
 from .models import Answer, Choice, Consent, Question, SubQuestion, Task
 
 
-class TaskInstructionView(CreateView):
+class TaskInstructionView(LoginRequiredMixin, CreateView):
     def get(self, request, alias):
         task = Task.objects.get(alias=alias)
         # Check if a Consent record already exists
@@ -42,13 +44,14 @@ class TaskInstructionView(CreateView):
             return render(request, "retimgeval/task_instruction.html", context)
 
 
-# Create your views here.
+@login_required
 def task_list(request):
     tasks = Task.objects.all()
     context = {"tasks": tasks}
     return render(request, "retimgeval/task_list.html", context)
 
 
+@login_required
 def get_next_unanswered_question(request, current_task):
     unanswered_questions = (
         Question.objects.filter(task=current_task)
@@ -62,6 +65,7 @@ def get_next_unanswered_question(request, current_task):
         return None
 
 
+@login_required
 def question_detail(request, slug):
     try:
         question = Question.objects.get(slug=slug)
