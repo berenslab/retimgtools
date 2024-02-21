@@ -27,7 +27,10 @@
 <h2>Information about the study</h2>
 
 <p>
-    Your annotations will be saved on a secure server in the EU and will be used to assess the quality of the disease prediction of an AI algorithm. Also, mouse movements will be tracked as long as the cursor is above the image. If you have additional questions, do not hesitate to ask. No personal information will be disclosed at any time. Please check "consent" below if you agree to these terms.
+    Your annotations will be saved on a secure server in the EU and will be used to assess the quality of the disease prediction of an AI algorithm. Also, mouse movements will be tracked as long as the cursor is above the image. If you have additional questions, do not hesitate to ask. No personal information will be disclosed at any time. 
+    {% if show_consent_form %}
+    Please check "consent" below if you agree to these terms.
+    {% endif %}
 </p>
 
     {% if show_consent_form %}

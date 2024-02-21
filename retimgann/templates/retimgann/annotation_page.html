@@ -135,7 +135,7 @@
                 <p>
                     If you need to interrupt a session, we will load the images and corresponding annotations that you have already submitted.               
                 </p>           
-            {% elif task.category == "annotate-oct" %}
+            {% elif "annotate-oct" in task.category %}
                 <p>
                     Your task is to annotate lesions related to Drusen on OCT images. By moving the mouse over the image, you get a magnified cutout of the image in the small window below. All images are from patients with Drusen. For best contrast, you may need to adjust the brightness of your monitor to maximal.
                 </p>

@@ -72,7 +72,7 @@ def task_instruction(request, task_id):
 
     if task.id == 1:
         return render(request, "retimgann/task_instruction_1.html", context)
-    elif task.id == 2:
+    elif task.id != 2:
         return render(request, "retimgann/task_instruction_2.html", context)
     # Add more conditions if there are more tasks
 

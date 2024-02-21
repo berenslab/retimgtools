@@ -51,14 +51,12 @@
 </div>
 <ul class="list-group">
   {% for task in annotation_tasks %}
-    {% if "bagnet" in task.category or "annotate" in task.category %}
-      <li class="list-group-item">
-        {% if task.is_active %}
-        <a href="{% url 'retimgann:task_instruction' task.id %}" class="text-decoration-none">{{ task.title }}</a> (active)
-        {% else %}
-        <span>{{ task.title }} (inactive)</span>
-        {% endif %}
-      </li> 
+    {% if task.is_active  %}
+      {% if "bagnet" in task.category or "annotate" in task.category %}
+        <li class="list-group-item">
+          <a href="{% url 'retimgann:task_instruction' task.id %}" class="text-decoration-none">{{ task.title }}</a>
+        </li> 
+      {% endif %}
     {% endif %}
   {% endfor %}
   {% for task in evalutation_tasks %}
@@ -72,13 +70,11 @@
       </li>
     {% endif %} {% endcomment %}
     {% if task.category == "erm-oct" %}
-      <li class="list-group-item">
         {% if task.is_active %}
-          <a href="{% url 'retimgeval:task_instruction' task.alias %}" class="text-decoration-none">{{ task.description }}</a> (active)
-        {% else %}
-          <span>{{ task.description }} (inactive)</span>
+            <li class="list-group-item">
+                <a href="{% url 'retimgeval:task_instruction' task.alias %}" class="text-decoration-none">{{ task.description }}</a> 
+            </li>
         {% endif %}
-      </li>
     {% endif %}
   {% endfor %}
 </ul>
