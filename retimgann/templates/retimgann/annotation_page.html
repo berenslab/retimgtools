@@ -8,7 +8,7 @@
 
 {% if task.alias == "bagnet-fundus" %}
 <h1>Lesion annotation for diabetic retinopathy (DR)</h1>
-{% elif task.alias == "annotate-oct"%}
+{% elif "annotate-oct" in task.alias%}
 <h1>Drusen annotation for OCT</h1>
 {% endif %}
 <div class="row">
@@ -108,7 +108,7 @@
                     </label>
                     <input type="text" id="otherLabelInput" style="display: none;">
                 </div>
-                {% elif task.category == "annotate-oct" %}
+                {% elif "annotate-oct" in task.category %}
                 <div class="form-check">
                     <input class="form-check-input acti" type="radio" name="label" id="labelDS" value="DS" checked>
                     <label class="form-check-label" for="labelDS">
