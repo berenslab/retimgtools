@@ -25,26 +25,31 @@
     </ul>
     {% endif %}
 
-    {% if task.alias == "realism-fundus-grading-no-support" %}
-    <h1>Grading of DR without decision support</h1>
-    <h3>Instruction</h3>
-    <ul>
-        <li>
-            You will be shown a <b>single</b> fundus image.
-        </li>
-        <li>
-            Decide whether the patient shows signs of referable Diabetic Retinopathy (DR), i.e. moderate, severe, or proliferative DR.
-        </li>
-        <li>
-            Additionally, rate the confidence of your decision on a scale of 1 (least confident) to 10 (most confident).
-        </li>
-        <li>
-            If you move your mouse over a region in the image, you are shown a zoomed version of that image region.
-        </li>
-        <li>
-            We record the time you take to reach your decision.
-        </li>
-    </ul>
+    {% if task.alias == "realism-fundus-grading-no-support" or task.alias == "realism-fundus-grading-without-support-2" %}
+    
+        {% if task.alias == "realism-fundus-grading-no-support" %}
+            <h1>Grading of DR without decision support</h1>
+        {% elif task.alias == "realism-fundus-grading-without-support-2" %}
+            <h1>Grading of DR</h1>
+        {% endif %}
+        <h3>Instruction</h3>
+        <ul>
+            <li>
+                You will be shown a <b>single</b> fundus image.
+            </li>
+            <li>
+                Decide whether the patient shows signs of referable Diabetic Retinopathy (DR), i.e. moderate, severe, or proliferative DR.
+            </li>
+            <li>
+                Additionally, rate the confidence of your decision on a scale of 1 (least confident) to 10 (most confident).
+            </li>
+            <li>
+                If you move your mouse over a region in the image, you are shown a zoomed version of that image region.
+            </li>
+            <li>
+                We record the time you take to reach your decision.
+            </li>
+        </ul>
     {% endif %}
 
     {% if task.alias == "realism-fundus-grading-with-support" %}

@@ -18,7 +18,10 @@ class Task(models.Model):
         return self.description
 
     def get_absolute_url(self, *args, **kwargs):
-        if "fundus-grading" in self.alias:
+        if (
+            self.alias == "realism-fundus-grading-no-support"
+            or self.alias == "realism-fundus-grading-with-support"
+        ):
             return reverse(
                 "retimgeval:question_detail",
                 kwargs={"slug": f"{self.alias}-q1p1"},

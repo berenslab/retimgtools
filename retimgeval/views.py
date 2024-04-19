@@ -35,8 +35,13 @@ class TaskInstructionView(LoginRequiredMixin, CreateView):
                 defaults={"consented": form.cleaned_data.get("consented")},
             )
             consent.save()
-            if "fundus-grading" in task.alias:
+            if (
+                task.alias == "realism-fundus-grading-no-support"
+                or task.alias == "realism-fundus-grading-with-support"
+            ):
                 return redirect("retimgeval:question_detail", slug=f"{alias}-q1p1")
+            elif task.alias == "realism-fundus-grading-without-support-2":
+                return redirect("retimgeval:question_detail", slug=f"{alias}-q1")
             else:
                 return redirect("retimgeval:question_detail", slug=f"{alias}-q1")
         else:
