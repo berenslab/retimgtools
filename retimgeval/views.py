@@ -40,8 +40,6 @@ class TaskInstructionView(LoginRequiredMixin, CreateView):
                 or task.alias == "realism-fundus-grading-with-support"
             ):
                 return redirect("retimgeval:question_detail", slug=f"{alias}-q1p1")
-            elif task.alias == "realism-fundus-grading-without-support-2":
-                return redirect("retimgeval:question_detail", slug=f"{alias}-q1")
             else:
                 return redirect("retimgeval:question_detail", slug=f"{alias}-q1")
         else:

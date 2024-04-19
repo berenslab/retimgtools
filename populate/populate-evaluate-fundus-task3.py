@@ -114,7 +114,7 @@ for img_num in range(1, num_images_without_support + 1):
         description=f"How confident are you of the assigned grade?",
         created_at=timezone.now(),
     )
-    for choice in range(1, 11):
+    for choice in range(1, 6):
         sub_question2.choice_set.create(
             choice_text=f"{choice}",
             created_at=timezone.now(),
