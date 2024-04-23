@@ -46,7 +46,7 @@
 </ul> 
 {% endcomment %}
 
-<div class="mt-4">
+{% comment %} <div class="mt-4">
   <h2 class="d-inline-block me-3">Decision support through sparse BagNets</h2>
 </div>
 <ul class="list-group">
@@ -60,7 +60,7 @@
     {% endif %}
   {% endfor %}
   {% for task in evalutation_tasks %}
-    {% comment %} {% if "bagnet" in task.category %}
+    {% if "bagnet" in task.category %}
       <li class="list-group-item">
         {% if task.is_active %}
           <a href="{% url 'retimgeval:task_instruction' task.alias %}" class="text-decoration-none">{{ task.description }}</a> (active)
@@ -68,7 +68,7 @@
           <span>{{ task.description }} (inactive)</span>
         {% endif %}
       </li>
-    {% endif %} {% endcomment %}
+    {% endif %}
     {% if task.category == "erm-oct" %}
         {% if task.is_active %}
             <li class="list-group-item">
@@ -77,7 +77,7 @@
         {% endif %}
     {% endif %}
   {% endfor %}
-</ul>
+</ul> {% endcomment %}
 
 {% else %}
 
