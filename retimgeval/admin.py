@@ -32,7 +32,7 @@ class AnswerAdmin(admin.ModelAdmin):
         "reaction_time",
         "delay_time",
     )
-    list_filter = ("user", "answered_at")
+    list_filter = ("user", "task")
     search_fields = ("choice", "user")
 
     actions = [csvexport]
