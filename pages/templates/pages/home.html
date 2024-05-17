@@ -16,7 +16,7 @@
 
 <ul class="list-group">
   {% for task in evalutation_tasks %}
-    {% if task.category == "realism-fundus" %}
+    {% if task.category == "realism-fundus" or task.category == "erm-macula" %}
       {% if task.is_active %}
         <li class="list-group-item">
             <a href="{% url 'retimgeval:task_instruction' task.alias %}" class="text-decoration-none">{{ task.description }}</a> 

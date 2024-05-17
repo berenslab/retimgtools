@@ -175,8 +175,10 @@ def question_detail(request, slug):
                 "delay_time": request.GET.get("delay_time", None),
             }
         )
-
-    return render(request, "retimgeval/question_detail.html", context)
+    if task.alias == "erm-macula":
+        return render(request, "retimgeval/question_detail_macula.html", context)
+    else:
+        return render(request, "retimgeval/question_detail.html", context)
 
 
 class ThankYouPageView(View):

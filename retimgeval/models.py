@@ -94,9 +94,18 @@ class SubQuestion(models.Model):
     description = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     slug = models.SlugField(max_length=200, blank=True, null=True)
+    image = models.ImageField(upload_to="images/", blank=True, null=True)
+    image_width = models.PositiveIntegerField(default=256)
+    image_height = models.PositiveIntegerField(default=256)
 
     def __str__(self):
         return self.description
+
+    def save(self, *args, **kwargs):
+        if self.image and not self.image_width:
+            image = PilImage.open(self.image.path)
+            self.image_width, self.image_height = image.size
+        super().save(*args, **kwargs)
 
 
 class Choice(models.Model):
@@ -106,10 +115,19 @@ class Choice(models.Model):
     )
     choice_text = models.CharField(max_length=200)
     image = models.ImageField(upload_to="images/", blank=True, null=True)
+    image_width = models.PositiveIntegerField(default=256)
+    image_height = models.PositiveIntegerField(default=256)
+
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     def __str__(self):
         return self.choice_text
+
+    def save(self, *args, **kwargs):
+        if self.image and not self.image_width:
+            image = PilImage.open(self.image.path)
+            self.image_width, self.image_height = image.size
+        super().save(*args, **kwargs)
 
 
 class Answer(models.Model):
