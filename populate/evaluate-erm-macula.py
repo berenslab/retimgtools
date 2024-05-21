@@ -45,15 +45,12 @@ num_images = len(all_images)
 
 for i, img in enumerate(all_images):
     j = i + 1
-    description = f"Image {j}/{num_images}"
-    slug = f"{alias}-q{j}"
-    print(f"{len(description)}", f"{len(slug)}")
 
     # Create the main question first
     main_question = task.question_set.create(
         description=f"Image {j}/{num_images}",
         created_at=timezone.now(),
-        slug=slug,
+        slug=f"{alias}-q{j}",
         image1=f"{img[6:]}",
         image1_width=450 * 2,
         image1_height=300 * 2,

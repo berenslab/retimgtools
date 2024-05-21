@@ -6,17 +6,17 @@
 
 {% if user.is_authenticated %}
 
-<div class="mb-2">
+{% comment %} <div class="mb-2">
   <h2 class="d-inline-block me-3">Decision support through AI-generated images</h2>
-</div>
+</div> {% endcomment %}
 
-<div class="mb-2">
+{% comment %} <div class="mb-2">
   <h4 class="d-inline-block me-3">Fundus</h4>
 </div>
 
 <ul class="list-group">
   {% for task in evalutation_tasks %}
-    {% if task.category == "realism-fundus" or task.category == "erm-macula" %}
+    {% if task.category == "realism-fundus" %}
       {% if task.is_active %}
         <li class="list-group-item">
             <a href="{% url 'retimgeval:task_instruction' task.alias %}" class="text-decoration-none">{{ task.description }}</a> 
@@ -24,33 +24,29 @@
       {% endif %}
     {% endif %}
   {% endfor %}
-</ul>
+</ul> {% endcomment %}
 
-{% comment %}  
-<div class="mt-3 mb-2">
+{% comment %} <div class="mt-3 mb-2">
   <h4 class="d-inline-block me-3">OCT</h4>
 </div>
 
 <ul class="list-group">
   {% for task in evalutation_tasks %}
-    {% if task.category == "realism-oct" %}
-      <li class="list-group-item">
-        {% if task.is_active %}
-          <a href="{% url 'retimgeval:task_instruction' task.alias %}" class="text-decoration-none">{{ task.description }}</a> (active)
-        {% else %}
-          <span>{{ task.description }} (inactive)</span>
-        {% endif %}
-      </li>
+    {% if task.category == "realism-oct"%}
+      {% if task.is_active %}
+        <li class="list-group-item">
+            <a href="{% url 'retimgeval:task_instruction' task.alias %}" class="text-decoration-none">{{ task.description }}</a> 
+        </li>
+      {% endif %}
     {% endif %}
   {% endfor %}
-</ul> 
-{% endcomment %}
+</ul>  {% endcomment %}
 
-{% comment %} <div class="mt-4">
+<div class="mt-4">
   <h2 class="d-inline-block me-3">Decision support through sparse BagNets</h2>
 </div>
 <ul class="list-group">
-  {% for task in annotation_tasks %}
+  {% comment %} {% for task in annotation_tasks %}
     {% if task.is_active  %}
       {% if "bagnet" in task.category or "annotate" in task.category %}
         <li class="list-group-item">
@@ -58,18 +54,16 @@
         </li> 
       {% endif %}
     {% endif %}
-  {% endfor %}
+  {% endfor %} {% endcomment %}
   {% for task in evalutation_tasks %}
     {% if "bagnet" in task.category %}
-      <li class="list-group-item">
-        {% if task.is_active %}
-          <a href="{% url 'retimgeval:task_instruction' task.alias %}" class="text-decoration-none">{{ task.description }}</a> (active)
-        {% else %}
-          <span>{{ task.description }} (inactive)</span>
-        {% endif %}
-      </li>
+      {% if task.is_active %}
+        <li class="list-group-item">
+            <a href="{% url 'retimgeval:task_instruction' task.alias %}" class="text-decoration-none">{{ task.description }}</a>
+        </li>
+      {% endif %}
     {% endif %}
-    {% if task.category == "erm-oct" %}
+    {% if task.category == "erm-oct" or task.category == "erm-macula" %}
         {% if task.is_active %}
             <li class="list-group-item">
                 <a href="{% url 'retimgeval:task_instruction' task.alias %}" class="text-decoration-none">{{ task.description }}</a> 
@@ -77,7 +71,7 @@
         {% endif %}
     {% endif %}
   {% endfor %}
-</ul> {% endcomment %}
+</ul>
 
 {% else %}
 
