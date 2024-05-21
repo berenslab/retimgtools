@@ -36,30 +36,26 @@ class Question(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     description = models.CharField(max_length=200)
 
-    image1 = models.ImageField(upload_to="images/", blank=True, null=True)
+    image1 = models.ImageField(
+        upload_to="images/", blank=True, null=True, max_length=255
+    )
     image1_title = models.CharField(max_length=200, blank=True, null=True)
     image1_width = models.PositiveIntegerField(default=256)
     image1_height = models.PositiveIntegerField(default=256)
 
-    image2 = models.ImageField(upload_to="images/", blank=True, null=True)
+    image2 = models.ImageField(
+        upload_to="images/", blank=True, null=True, max_length=255
+    )
     image2_title = models.CharField(max_length=200, blank=True, null=True)
     image2_width = models.PositiveIntegerField(default=256)
     image2_height = models.PositiveIntegerField(default=256)
 
-    image3 = models.ImageField(upload_to="images/", blank=True, null=True)
+    image3 = models.ImageField(
+        upload_to="images/", blank=True, null=True, max_length=255
+    )
     image3_title = models.CharField(max_length=200, blank=True, null=True)
     image3_width = models.PositiveIntegerField(default=256)
     image3_height = models.PositiveIntegerField(default=256)
-
-    image4 = models.ImageField(upload_to="images/", blank=True, null=True)
-    image4_title = models.CharField(max_length=200, blank=True, null=True)
-    image4_width = models.PositiveIntegerField(default=256)
-    image4_height = models.PositiveIntegerField(default=256)
-
-    image5 = models.ImageField(upload_to="images/", blank=True, null=True)
-    image5_title = models.CharField(max_length=200, blank=True, null=True)
-    image5_width = models.PositiveIntegerField(default=256)
-    image5_height = models.PositiveIntegerField(default=256)
 
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     slug = models.SlugField(max_length=200, blank=True, null=True)
@@ -77,15 +73,6 @@ class Question(models.Model):
         if self.image3 and not self.image3_width:
             image3 = PilImage.open(self.image3.path)
             self.image3_width, self.image3_height = image3.size
-
-        if self.image4 and not self.image4_width:
-            image4 = PilImage.open(self.image4.path)
-            self.image4_width, self.image4_height = image4.size
-
-        if self.image5 and not self.image5_width:
-            image5 = PilImage.open(self.image5.path)
-            self.image5_width, self.image5_height = image5.size
-
         super().save(*args, **kwargs)
 
 
@@ -94,7 +81,9 @@ class SubQuestion(models.Model):
     description = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     slug = models.SlugField(max_length=200, blank=True, null=True)
-    image = models.ImageField(upload_to="images/", blank=True, null=True)
+    image = models.ImageField(
+        upload_to="images/", blank=True, null=True, max_length=255
+    )
     image_width = models.PositiveIntegerField(default=256)
     image_height = models.PositiveIntegerField(default=256)
 
@@ -114,7 +103,9 @@ class Choice(models.Model):
         SubQuestion, on_delete=models.CASCADE, null=True, blank=True
     )
     choice_text = models.CharField(max_length=200)
-    image = models.ImageField(upload_to="images/", blank=True, null=True)
+    image = models.ImageField(
+        upload_to="images/", blank=True, null=True, max_length=255
+    )
     image_width = models.PositiveIntegerField(default=256)
     image_height = models.PositiveIntegerField(default=256)
 

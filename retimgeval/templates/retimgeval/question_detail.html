@@ -13,8 +13,6 @@
             {% if question.image1 %}<th>a</th>{% endif %}
             {% if question.image2 %}<th>b</th>{% endif %}
             {% if question.image3 %}<th>c</th>{% endif %}
-            {% if question.image4 %}<th>d</th>{% endif %}
-            {% if question.image5 %}<th>e</th>{% endif %}
         </tr>
     {% elif "bagnet" in question.task.alias %}
         {% if "no-support" in question.task.alias %}
@@ -76,28 +74,6 @@
             <td>
                 <div>
                     <canvas class="imageCanvas" width="{{ question.image3_width }}" height="{{ question.image3_height }}" data-src="{{ question.image3.url }}"></canvas>
-                </div>
-                <div>
-                    <canvas class="magnifierCanvas" width="100" height="100" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
-                </div>
-            </td>
-        {% endif %}
-
-        {% if question.image4 %}
-            <td>
-                <div>
-                    <canvas class="imageCanvas" width="{{ question.image4_width }}" height="{{ question.image4_height }}" data-src="{{ question.image4.url }}"></canvas>
-                </div>
-                <div>
-                    <canvas class="magnifierCanvas" width="100" height="100" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
-                </div>
-            </td>
-        {% endif %}
-
-        {% if question.image5 %}
-            <td>
-                <div>
-                    <canvas class="imageCanvas" width="{{ question.image5_width }}" height="{{ question.image5_height }}" data-src="{{ question.image5.url }}"></canvas>
                 </div>
                 <div>
                     <canvas class="magnifierCanvas" width="100" height="100" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
