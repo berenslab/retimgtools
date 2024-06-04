@@ -24,6 +24,7 @@ class ChoiceAdmin(admin.ModelAdmin):
 class AnswerAdmin(admin.ModelAdmin):
     list_display = (
         "choice",
+        "notes",
         "user",
         "task",
         "question",

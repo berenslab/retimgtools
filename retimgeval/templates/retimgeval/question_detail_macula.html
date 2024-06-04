@@ -74,12 +74,27 @@
                     <div class="sub-question-form choices-vertical mt-2">
                         {% for choice in form.fields.choice.queryset %}
                             <div class="choice-item">
-                                <input type="radio" id="choice_{{ choice.id }}" name="{{ sub_question.id }}" value="{{ choice.id }}">
+                                <input type="radio" id="choice_{{ choice.id }}" name="{{ sub_question.id }}" value="{{ choice.id }}" 
+                                       onclick="toggleNotes('{{ choice.choice_text }}', '{{ sub_question.id }}')">
                                 <label for="choice_{{ choice.id }}">
                                     {{ choice.choice_text }}
                                 </label>
                             </div>
                         {% endfor %}
+                        <!-- Add notes field here -->
+                        <div class="form-group mt-3">
+                            <textarea id="notes_{{ sub_question.id }}" name="notes_{{ sub_question.id }}" class="form-control" rows="3" style="display:none;" placeholder="why?"></textarea>
+                        </div>
+                        <script>
+                            function toggleNotes(choiceText, subQuestionId) {
+                                var notesTextarea = document.getElementById('notes_' + subQuestionId);
+                                if (choiceText.toLowerCase() === 'unsure') {
+                                    notesTextarea.style.display = 'block';
+                                } else {
+                                    notesTextarea.style.display = 'none';
+                                }
+                            }
+                        </script>
                     </div>
                     {% if sub_question in unanswered_sub_questions %}
                     <div class="alert alert-danger">

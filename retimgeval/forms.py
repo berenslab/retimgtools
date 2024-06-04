@@ -17,7 +17,7 @@ class ConsentForm(forms.ModelForm):
 class AnswerForm(forms.ModelForm):
     class Meta:
         model = Answer
-        fields = ["choice"]
+        fields = ["choice", "notes"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

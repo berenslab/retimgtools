@@ -94,7 +94,8 @@ def question_detail(request, slug):
 
             for sub_question in sub_questions:
                 choice_id = request.POST.get(str(sub_question.id), None)
-                form_data = {"choice": choice_id}
+                notes = request.POST.get(f"notes_{sub_question.id}", "")
+                form_data = {"choice": choice_id, "notes": notes}
                 form = AnswerForm(form_data)
                 form.fields["choice"].queryset = sub_question.choice_set.all()
 

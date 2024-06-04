@@ -133,6 +133,7 @@ class Answer(models.Model):
     answered_at = models.DateTimeField(auto_now=True, blank=True, null=True)
     reaction_time = models.FloatField(blank=True, null=True)
     delay_time = models.FloatField(blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.choice.choice_text
