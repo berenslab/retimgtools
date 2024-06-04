@@ -31,7 +31,7 @@ SECRET_KEY = env.str("SECRET_KEY")
 DEBUG = env.bool("DEBUG", default=False)
 
 # ALLOWED_HOSTS = ["*"]
-ALLOWED_HOSTS = ["r.etr.ist", "retimgtools.fly.dev", "*"]
+ALLOWED_HOSTS = ["r.etr.ist", "retimgtools.fly.dev"]
 
 
 # Application definition
@@ -160,4 +160,4 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
-SECURE_SSL_REDIRECT = False
+SECURE_SSL_REDIRECT = True
