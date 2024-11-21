@@ -3,4 +3,7 @@ fly.toml
 .git/
 *.sqlite3
 .retimgtools/
-
+media/annoate
+media/evaluate/BagNet
+media/evaluate/Fundus
+media/evaluate/OCT

@@ -30,8 +30,8 @@ SECRET_KEY = env.str("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", default=False)
 
-# ALLOWED_HOSTS = ["*"]
-ALLOWED_HOSTS = ["r.etr.ist", "retimgtools.fly.dev"]
+ALLOWED_HOSTS = ["*"]
+# ALLOWED_HOSTS = ["r.etr.ist", "retimgtools.fly.dev"]
 
 
 # Application definition
@@ -97,6 +97,10 @@ DATABASES = {
     "default": env.dj_db_url("DATABASE_URL", default="sqlite:///db.sqlite3"),
 }
 
+# DATABASES = {
+#     "default": env.dj_db_url("sqlite:///db.sqlite3", default="sqlite:///db.sqlite3"),
+# }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -160,4 +164,4 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
-SECURE_SSL_REDIRECT = True
+SECURE_SSL_REDIRECT = False
