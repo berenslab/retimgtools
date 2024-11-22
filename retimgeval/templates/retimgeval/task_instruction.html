@@ -88,7 +88,7 @@
         </ul>
     {% endif %}
 
-    {% if task.alias == "bagnet-grading-no-support" or task.alias == "bagnet-fp-grading-no-support" %}
+    {% if task.alias == "bagnet-grading-no-support" %}
     <h1>Grading of DR without decision support from AI</h1>
     <h3>Instruction </h3>
     <ul>
@@ -151,6 +151,35 @@
         </li>
         <li>
             Additionally, rate the confidence of your decision on a scale of 1 (least confident) to 5 (most confident).
+        </li>
+        <li>
+            If you move your mouse over a region in the image, you are shown a zoomed version of that image region.
+        </li>
+        <li>
+            We record the time you take to reach your decision. 
+        </li>
+    </ul>
+    {% endif %}
+
+    {% if task.alias == "bagnet-fp" %}
+    <h1>
+        Grading of DR with decision support and explanations from AI
+    </h1>
+    <h3>
+        Instruction
+    </h3>
+    <ul>
+        <li>
+            You will be shown a single fundus image along with an AI model’s decision.
+        </li>
+        <li>
+            Regions in the image for which the AI model believes that they contain signs of DR will be highlighted by blue boxes. Be aware that some boxes may be erroneously placed and may not contain real lesions. Also, not all lesions are flagged.
+        </li>
+        <li>
+            Based on the image, decide whether the patient has Diabetic Retinopathy (DR) of any severity, including mild DR.
+        </li>
+        <li>
+            Additionally, decide whether the bounding boxes on the image contain DR-related lesions. If not, write down why you think the algorithm highlighted these regions in the text box.
         </li>
         <li>
             If you move your mouse over a region in the image, you are shown a zoomed version of that image region.

@@ -3,6 +3,7 @@ import os
 import random
 import sys
 
+import pandas as pd
 from django.utils import timezone
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "config.settings"
@@ -26,7 +27,7 @@ except:
     pass
 
 # BagNet task 1
-alias = "bagnet-fp-grading-with-support"
+alias = "bagnet-fp"
 task = Task(
     description="Grading of DR with decision support from AI",
     category="bagnet",
@@ -35,25 +36,42 @@ task = Task(
 )
 task.save()
 
-# List all image files
-all_images_without_support = glob.glob("media/evaluate/BagNetFP/without_support/*.png")
-all_images_with_support = glob.glob("media/evaluate/BagNetFP/with_support/*.png")
+# Load the CSV file
+csv_file = "media/evaluate/BagNetFP/bagnet_fp_classification_30.csv"
+df = pd.read_csv(csv_file)
+
+# Extract the list of filenames from the CSV
+filenames = df["filename"].tolist()
+
+# List all image files in both folders
+images_without_support = sorted(glob.glob("media/evaluate/BagNetFP/no_support/*.png"))
+images_with_support = sorted(glob.glob("media/evaluate/BagNetFP/with_support/*.png"))
+
+# Filter images based on the filenames in the CSV
+filtered_images_without_support = [
+    img for img in images_without_support if os.path.basename(img) in filenames
+]
+filtered_images_with_support = [
+    img for img in images_with_support if os.path.basename(img) in filenames
+]
+
+# Ensure the lengths of both lists match
+if len(images_without_support) != len(images_with_support):
+    raise ValueError(
+        "Mismatch in the number of images between the 'without_support' and 'with_support' folders."
+    )
 
 # Seed for pseudorandomization (you can set it to any integer value for consistency)
 seed = 42
-
-# Shuffle using the seed
 random.seed(seed)
-randomized_images_without_support = sorted(
-    all_images_without_support, key=lambda x: random.random()
-)
-randomized_images_with_support = sorted(
-    all_images_with_support, key=lambda x: random.random()
-)
 
-num_images = len(randomized_images_without_support)
+# Pair the images and randomize them together
+paired_images = list(zip(images_without_support, images_with_support))
+random.shuffle(paired_images)
 
-for i, img in enumerate(randomized_images_without_support):
+num_images = len(paired_images)
+
+for i, (img_without_support, img_with_support) in enumerate(paired_images):
     j = i + 1
 
     # Create the main question first
@@ -61,10 +79,10 @@ for i, img in enumerate(randomized_images_without_support):
         description=f"Question {j}/{num_images}",
         created_at=timezone.now(),
         slug=f"{alias}-q{j}",
-        image1=f"{img[6:]}",
+        image1=f"{img_without_support[6:]}",  # Image without support
         image1_width=512,
         image1_height=512,
-        image2=f"{img[6:]}",
+        image2=f"{img_with_support[6:]}",  # Image with support
         image2_width=512,
         image2_height=512,
     )
@@ -83,12 +101,6 @@ for i, img in enumerate(randomized_images_without_support):
 
     # Sub-question 2
     sub_question2 = main_question.subquestion_set.create(
-        description=f"Do the bounding boxes contain DR related lesions?",
+        description=f"",
         created_at=timezone.now(),
     )
-
-    for choice in ["Yes", "No"]:
-        sub_question2.choice_set.create(
-            choice_text=f"{choice}",
-            created_at=timezone.now(),
-        )

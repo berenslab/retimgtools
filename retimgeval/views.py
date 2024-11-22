@@ -93,9 +93,27 @@ def question_detail(request, slug):
             unanswered_sub_questions = []
 
             for sub_question in sub_questions:
-                choice_id = request.POST.get(str(sub_question.id), None)
+                has_choices = sub_question.choice_set.exists()
+
+                # Check for submitted data
+                choice_id = (
+                    request.POST.get(str(sub_question.id), None)
+                    if has_choices
+                    else None
+                )
                 notes = request.POST.get(f"notes_{sub_question.id}", "")
+                print(notes)
+                if not has_choices:
+                    # Assign a dummy choice if the subquestion has no choices
+                    dummy_choice, created = Choice.objects.get_or_create(
+                        question=sub_question.question,
+                        sub_question=sub_question,
+                        choice_text="Comments",
+                    )
+                    choice_id = dummy_choice.id
+
                 form_data = {"choice": choice_id, "notes": notes}
+                print(form_data)
                 form = AnswerForm(form_data)
                 form.fields["choice"].queryset = sub_question.choice_set.all()
 

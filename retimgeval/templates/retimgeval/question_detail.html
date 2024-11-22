@@ -14,7 +14,7 @@
             {% if question.image2 %}<th>b</th>{% endif %}
             {% if question.image3 %}<th>c</th>{% endif %}
         </tr>
-    {% elif "bagnet" in question.task.alias %}
+    {% elif "bagnet" in question.task.alias and "fp" not in question.task.alias %}
         {% if "no-support" in question.task.alias %}
         <tr>
             <th></th>
@@ -24,6 +24,11 @@
             <th></th>
         </tr>     
         {% endif %}
+    {% elif "bagnet-fp" in question.task.alias %}
+        <tr>
+            {% if question.image1 %}<th>Original</th>{% endif %}
+            {% if question.image2 %}<th>Annotated</th>{% endif %}
+        </tr>    
     {% else %}
         {% if question.image2 and not question.image4%}
             <tr>
@@ -46,9 +51,14 @@
                 <!-- Image canvas -->
                 <div>
                     <canvas class="imageCanvas" width="{{ question.image1_width }}" height="{{ question.image1_height }}" data-src="{{ question.image1.url }}"></canvas>
-                    <div>
+                    {% if not question.image2 and not question.image3 %}
+                        <!-- Magnifier side by side -->
                         <canvas class="magnifierCanvas" width="100" height="100" style="border:1px solid #d3d3d3"></canvas>
-                    </div>
+                    {% else %}
+                        <div>
+                            <canvas class="magnifierCanvas" width="100" height="100" style="border:1px solid #d3d3d3"></canvas>
+                        </div>
+                    {% endif %}
                 </div>
                 
                 {% if question.image1_title %}
@@ -66,7 +76,7 @@
                     <canvas class="imageCanvas" width="{{ question.image2_width }}" height="{{ question.image2_height }}" data-src="{{ question.image2.url }}"></canvas>
                 </div>
                 <div>
-                    <canvas class="magnifierCanvas" width="100" height="100" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+                    <canvas class="magnifierCanvas" width="100" height="100" style="border:1px solid #d3d3d3"></canvas>
                 </div>
             </td>
         {% endif %}
@@ -76,7 +86,7 @@
                     <canvas class="imageCanvas" width="{{ question.image3_width }}" height="{{ question.image3_height }}" data-src="{{ question.image3.url }}"></canvas>
                 </div>
                 <div>
-                    <canvas class="magnifierCanvas" width="100" height="100" style="{% if not "grading" in question.task.alias %}display: none;{% endif %} border:1px solid #d3d3d3"></canvas>
+                    <canvas class="magnifierCanvas" width="100" height="100" style="border:1px solid #d3d3d3"></canvas>
                 </div>
             </td>
         {% endif %}
@@ -89,54 +99,84 @@
   <form action="{{ question.get_absolute_url }}" method="POST">
     {% csrf_token %}
     {% for sub_question, form in sub_questions_and_forms %}
-    <div class="sub-question mt-3">
-        <h4>{{ sub_question.description }}</h4>
-        {% if sub_question in unanswered_sub_questions %}
-        <div class="alert alert-danger">
-            This subquestion is not yet answered.
+        <div class="sub-question mt-2">
+            <h4>{{ sub_question.description }}</h4>
+            {% if sub_question in unanswered_sub_questions %}
+                <div class="alert alert-danger">
+                    This subquestion is not yet answered.
+                </div>
+            {% endif %}
+
+            {% if forloop.first %}
+                <!-- First question with choices -->
+                <div class="sub-question-form choices">
+                    {% for choice in form.choice.field.choices %}
+                        <input 
+                            class="me-1" 
+                            type="radio" 
+                            id="choice_{{ choice.0 }}" 
+                            name="{{ sub_question.id }}" 
+                            value="{{ choice.0 }}" 
+                            onclick="handleFirstQuestionChoice('{{ choice.1 }}', '{{ sub_question.id }}')">
+                        <label class="me-5" for="choice_{{ choice.0 }}">{{ choice.1 }}</label>
+                    {% endfor %}
+                </div>
+                <!-- Text area for the first question -->
+                <div class="form-group mt-2">
+                    <textarea 
+                        id="notes_{{ sub_question.id }}" 
+                        name="notes_{{ sub_question.id }}" 
+                        class="form-control" 
+                        rows="3" 
+                        style="display:none;width: 75% !important;" 
+                        placeholder="How many bounding boxes contain lesions?"></textarea>
+                </div>
+            {% else %}
+                <!-- Second question text area -->
+                <div class="form-group mt-3">
+                    <textarea 
+                        id="notes_{{ sub_question.id }}" 
+                        name="notes_{{ sub_question.id }}" 
+                        class="form-control" 
+                        rows="10" 
+                        style="display:none;width: 75% !important;" 
+                        placeholder="Which bounding boxes contain lesions and what other comments do you have?"></textarea>
+                </div>
+            {% endif %}
         </div>
-        {% endif %}
-        <div class="sub-question-form choices">
-            {% for choice in form.choice.field.choices %}
-                <input 
-                    class="me-1" 
-                    type="radio" 
-                    id="choice_{{ choice.0 }}" 
-                    name="{{ sub_question.id }}" 
-                    value="{{ choice.0 }}" 
-                    onclick="toggleNotes('{{ choice.1 }}', '{{ sub_question.id }}')">
-                <label class="me-5" for="choice_{{ choice.0 }}">{{ choice.1 }}</label>
-            {% endfor %}
-        </div>
-        <!-- Add notes field here / for bagnet fp-->
-        <div class="form-group mt-3">
-            <textarea 
-                id="notes_{{ sub_question.id }}" 
-                name="notes_{{ sub_question.id }}" 
-                class="form-control" 
-                rows="10" 
-                style="display:none;width: 75% !important;" 
-                placeholder="What do you think made the algorithm highlight these regions?"></textarea>
-        </div>
-    </div>
-    <br>
     {% endfor %}
-    <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+    <button type="submit" class="btn btn-primary mt-2">Submit</button>
+  </form>
 
 <script>
     /**
-     * Toggle the visibility of the notes field for specific subquestions and choices.
+     * Handles the choice selection for the first question.
      * @param {string} choiceText - The text of the selected choice.
-     * @param {string} subQuestionId - The ID of the subquestion.
      */
-    function toggleNotes(choiceText, subQuestionId) {
-        const notesTextarea = document.getElementById('notes_' + subQuestionId);
+     function handleFirstQuestionChoice(choiceText, currentSubQuestionId) {
+        const firstNotesId = `notes_${currentSubQuestionId}`; // Dynamic ID for the first question's notes
+        const secondNotesId = `notes_${parseInt(currentSubQuestionId) + 1}`; // Calculate second question's ID based on the first
+    
+        const firstNotes = document.getElementById(firstNotesId); // Get the first notes textarea
+        const secondNotes = document.getElementById(secondNotesId); // Get the second notes textarea
+    
+        if (choiceText.toLowerCase() === 'no dr') {
+            // Hide the first notes and show the second notes
+            firstNotes.style.display = 'none';
+            secondNotes.style.display = 'block';
+            secondNotes.placeholder = "What do you think made the algorithm highlight these regions?";
+        } else if (choiceText.toLowerCase() === 'dr') {
+            // Show both text areas
+            firstNotes.style.display = 'block';
+            firstNotes.placeholder = "How many bounding boxes contain lesions?";
 
-        if (choiceText.toLowerCase() === 'no') {
-            notesTextarea.style.display = 'block'; // Show notes field
-        } else {
-            notesTextarea.style.display = 'none'; // Hide notes field
+            // Enforce numeric-only input
+            firstNotes.addEventListener('input', function () {
+                this.value = this.value.replace(/[^0-9]/g, ''); // Allow only numbers
+            });
+
+            secondNotes.style.display = 'block';
+            secondNotes.placeholder = "Which bounding boxes contain lesions and what other comments do you have?";
         }
     }
 </script>
