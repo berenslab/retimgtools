@@ -123,24 +123,30 @@
                 </div>
                 <!-- Text area for the first question -->
                 <div class="form-group mt-2">
+                    <h6 id="heading_notes_{{ sub_question.id }}" style="display:none;">
+                        Which bounding boxes contain DR-related lesions? (Number only, separate by commas)
+                    </h6>
                     <textarea 
                         id="notes_{{ sub_question.id }}" 
                         name="notes_{{ sub_question.id }}" 
                         class="form-control" 
                         rows="3" 
                         style="display:none;width: 75% !important;" 
-                        placeholder="How many bounding boxes contain lesions?"></textarea>
+                        placeholder="e.g. 1,4,10"></textarea>
                 </div>
             {% else %}
                 <!-- Second question text area -->
                 <div class="form-group mt-3">
+                    <h6 id="heading_notes_{{ sub_question.id }}" style="display:none;">
+                        What do you think made the algorithm highlight those regions without lesions? Or, what do the other boxes highlight?
+                    </h6>
                     <textarea 
                         id="notes_{{ sub_question.id }}" 
                         name="notes_{{ sub_question.id }}" 
                         class="form-control" 
                         rows="10" 
                         style="display:none;width: 75% !important;" 
-                        placeholder="Which bounding boxes contain lesions and what other comments do you have?"></textarea>
+                        ></textarea>
                 </div>
             {% endif %}
         </div>
@@ -160,23 +166,35 @@
         const firstNotes = document.getElementById(firstNotesId); // Get the first notes textarea
         const secondNotes = document.getElementById(secondNotesId); // Get the second notes textarea
     
+        const firstHeading = document.getElementById(`heading_notes_${currentSubQuestionId}`); // Heading for first question
+        const secondHeading = document.getElementById(`heading_notes_${parseInt(currentSubQuestionId) + 1}`); // Heading for second question
+    
         if (choiceText.toLowerCase() === 'no dr') {
             // Hide the first notes and show the second notes
-            firstNotes.style.display = 'none';
-            secondNotes.style.display = 'block';
-            secondNotes.placeholder = "What do you think made the algorithm highlight these regions?";
+            if (firstNotes) firstNotes.style.display = 'none';
+            if (firstHeading) firstHeading.style.display = 'none';
+    
+            if (secondNotes) secondNotes.style.display = 'block';
+            if (secondHeading) secondHeading.style.display = 'block';
+            if (secondHeading) secondHeading.textContent = "What do you think made the algorithm highlight these regions? Or, what do the boxes highlight?";
         } else if (choiceText.toLowerCase() === 'dr') {
             // Show both text areas
-            firstNotes.style.display = 'block';
-            firstNotes.placeholder = "How many bounding boxes contain lesions?";
-
+            if (firstNotes) firstNotes.style.display = 'block';
+            if (firstHeading) {
+                firstHeading.style.display = 'block';
+                firstHeading.textContent = "Which bounding boxes contain DR-related lesions? (Number only, separate by commas)";
+            }
+    
             // Enforce numeric-only input
             firstNotes.addEventListener('input', function () {
-                this.value = this.value.replace(/[^0-9]/g, ''); // Allow only numbers
+                this.value = this.value.replace(/[^0-9,]/g, ''); // Allow only numbers and commas
             });
-
-            secondNotes.style.display = 'block';
-            secondNotes.placeholder = "Which bounding boxes contain lesions and what other comments do you have?";
+    
+            if (secondNotes) secondNotes.style.display = 'block';
+            if (secondHeading) {
+                secondHeading.style.display = 'block';
+                secondHeading.textContent = "What do you think made the algorithm highlight those regions without lesions? Or, what do the other boxes highlight?";
+            }
         }
     }
 </script>

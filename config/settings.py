@@ -97,9 +97,9 @@ DATABASES = {
     "default": env.dj_db_url("DATABASE_URL", default="sqlite:///db.sqlite3"),
 }
 
-DATABASES = {
-    "default": env.dj_db_url("sqlite:///db.sqlite3", default="sqlite:///db.sqlite3"),
-}
+# DATABASES = {
+#     "default": env.dj_db_url("sqlite:///db.sqlite3", default="sqlite:///db.sqlite3"),
+# }
 
 
 # Password validation

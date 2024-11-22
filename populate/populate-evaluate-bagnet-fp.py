@@ -1,9 +1,9 @@
+import csv
 import glob
 import os
 import random
 import sys
 
-import pandas as pd
 from django.utils import timezone
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "config.settings"
@@ -38,10 +38,11 @@ task.save()
 
 # Load the CSV file
 csv_file = "media/evaluate/BagNetFP/bagnet_fp_classification_30.csv"
-df = pd.read_csv(csv_file)
-
-# Extract the list of filenames from the CSV
-filenames = df["filename"].tolist()
+filenames = []
+with open(csv_file, "r") as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        filenames.append(row["filename"])
 
 # List all image files in both folders
 images_without_support = sorted(glob.glob("media/evaluate/BagNetFP/no_support/*.png"))
@@ -55,6 +56,8 @@ filtered_images_with_support = [
     img for img in images_with_support if os.path.basename(img) in filenames
 ]
 
+print(len(filtered_images_without_support), len(filtered_images_with_support))
+
 # Ensure the lengths of both lists match
 if len(images_without_support) != len(images_with_support):
     raise ValueError(
@@ -66,7 +69,7 @@ seed = 42
 random.seed(seed)
 
 # Pair the images and randomize them together
-paired_images = list(zip(images_without_support, images_with_support))
+paired_images = list(zip(filtered_images_without_support, filtered_images_with_support))
 random.shuffle(paired_images)
 
 num_images = len(paired_images)
