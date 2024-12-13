@@ -96,14 +96,12 @@ def question_detail(request, slug):
                 has_choices = sub_question.choice_set.exists()
 
                 # Check for submitted data
-                choice_id = (
-                    request.POST.get(str(sub_question.id), None)
-                    if has_choices
-                    else None
-                )
+                choice_id = request.POST.get(str(sub_question.id), None)
+                print("before forced choice:", choice_id)
+
                 notes = request.POST.get(f"notes_{sub_question.id}", "")
                 print(notes)
-                if not has_choices:
+                if choice_id is None:
                     # Assign a dummy choice if the subquestion has no choices
                     dummy_choice, created = Choice.objects.get_or_create(
                         question=sub_question.question,
@@ -113,7 +111,7 @@ def question_detail(request, slug):
                     choice_id = dummy_choice.id
 
                 form_data = {"choice": choice_id, "notes": notes}
-                print(form_data)
+                print(choice_id, form_data)
                 form = AnswerForm(form_data)
                 form.fields["choice"].queryset = sub_question.choice_set.all()
 
