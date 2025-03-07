@@ -6,13 +6,15 @@ https://retimgtools.fly.dev
 
 ## Run locally
 
-First of all, put your images in the `media` directory. If the `media` directory does not exist, create it:
+Before running the application, place your images in the media directory. If it does not exist, create the necessary folders:
 
 ```shell
-mkdir media && mkdir media/annotate && mkdir media/evaluate
+mkdir -p media/annotate media/evaluate
 ```
 
-Then, put your images into the corresponding directories. The images will be populated to the database when you run the `populate-*.py` script. Here's an example:
+Then, add your images to the corresponding directories. The database will be populated with these images when you run the populate-*.py script.
+
+Install dependencies and set up the environment:
 
 ```shell
 pip install -r requirements.txt
@@ -25,6 +27,6 @@ python populate-evaluate-fundus.py
 python manage.py runserver
 ```
 
-You need to adapt the `populate-*.py` script to your own dataset.
+You need to adapt the `populate-*.py` script to match your dataset.
 
-Currently, the frontend is primitive and with many parts hard-coded as our project evolves. We will make it more flexible in the future. But for now you also need to adapt the frontend codes (`retimgann/templates/retimgann/*.html` and `retimgeval/templates/retimgeval/*.html`) according to your dataset.
+Currently, the frontend is primitive and contains hardcoded elements as the project evolves. We plan to make it more flexible in the future, but for now, you may need to modify the templates (r`etimgann/templates/retimgann/*.html` and `retimgeval/templates/retimgeval/*.html`) to suit your data.
