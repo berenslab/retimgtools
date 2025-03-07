@@ -7,6 +7,10 @@ User = get_user_model()
 
 
 class Task(models.Model):
+    """
+    Represents a task with a description, category, and optional alias.
+    Tasks can be active or inactive.
+    """
     description = models.TextField()
     category = models.CharField(max_length=200)
     is_active = models.BooleanField(default=True)
@@ -18,6 +22,13 @@ class Task(models.Model):
         return self.description
 
     def get_absolute_url(self, *args, **kwargs):
+        """
+        Returns the absolute URL for the task's associated question.
+        Special handling for specific aliases.
+
+        The conditional logic is for backwards compatibility with the old
+        version before the implementation of Subquestion.
+        """
         if (
             self.alias == "realism-fundus-grading-no-support"
             or self.alias == "realism-fundus-grading-with-support"
@@ -33,6 +44,12 @@ class Task(models.Model):
 
 
 class Question(models.Model):
+
+    """
+    Represents a question associated with a task.
+    It can have up to three images with associated titles and dimensions.
+    """
+
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     description = models.CharField(max_length=200)
 
@@ -64,6 +81,16 @@ class Question(models.Model):
         return self.description
 
     def save(self, *args, **kwargs):
+
+        """
+        Overrides the save method to automatically update image dimensions.
+        This avoids storing incorrect values when an image is uploaded.
+
+        This will take precedence over the image dimensions set in the admin. 
+        So if the image dimensions are set in the admin, they will be overwritten 
+        by the actual image dimensions.
+        """
+
         if self.image1 and not self.image1_width:
             image1 = PilImage.open(self.image1.path)
             self.image1_width, self.image1_height = image1.size
@@ -77,6 +104,9 @@ class Question(models.Model):
 
 
 class SubQuestion(models.Model):
+    """
+    Represents a sub-question under a specific question.
+    """
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     description = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
@@ -98,6 +128,9 @@ class SubQuestion(models.Model):
 
 
 class Choice(models.Model):
+    """
+    Represents an answer choice for a question or sub-question.
+    """
     question = models.ForeignKey(Question, on_delete=models.CASCADE, null=True)
     sub_question = models.ForeignKey(
         SubQuestion, on_delete=models.CASCADE, null=True, blank=True
@@ -122,6 +155,9 @@ class Choice(models.Model):
 
 
 class Answer(models.Model):
+    """
+    Stores user answers to questions and sub-questions.
+    """
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     sub_question = models.ForeignKey(
@@ -146,6 +182,9 @@ class Answer(models.Model):
 
 
 class Consent(models.Model):
+    """
+    Tracks whether a user has consented to a specific task.
+    """
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="retimgeval_consent"
     )

@@ -10,7 +10,14 @@ from .models import Answer, Choice, Consent, Question, SubQuestion, Task
 
 
 class TaskInstructionView(LoginRequiredMixin, CreateView):
+    """
+    Displays task instructions and handles consent form submission.
+    """
     def get(self, request, alias):
+        """
+        Handles GET request for displaying task instructions.
+        Checks if the user has already consented to the task.
+        """
         task = Task.objects.get(alias=alias)
         # Check if a Consent record already exists
         already_consented = False
@@ -26,6 +33,10 @@ class TaskInstructionView(LoginRequiredMixin, CreateView):
         return render(request, "retimgeval/task_instruction.html", context)
 
     def post(self, request, alias):
+        """
+        Handles POST request for submitting consent form.
+        If the form is valid and consent is given, the user is redirected to the first question.
+        """
         form = ConsentForm(request.POST)
         task = Task.objects.get(alias=alias)
         if form.is_valid() and form.cleaned_data.get("consented") is True:
@@ -49,6 +60,9 @@ class TaskInstructionView(LoginRequiredMixin, CreateView):
 
 @login_required
 def task_list(request):
+    """
+    Displays a list of available tasks.
+    """
     tasks = Task.objects.all()
     context = {"tasks": tasks}
     return render(request, "retimgeval/task_list.html", context)
@@ -56,6 +70,10 @@ def task_list(request):
 
 @login_required
 def get_next_unanswered_question(request, current_task):
+    """
+    Retrieves the next unanswered question for the user in the given task.
+    Returns None if all questions have been answered.
+    """
     unanswered_questions = (
         Question.objects.filter(task=current_task)
         .exclude(answer__user=request.user)
@@ -70,6 +88,10 @@ def get_next_unanswered_question(request, current_task):
 
 @login_required
 def question_detail(request, slug):
+    """
+    Displays a question and handles answer submissions.
+    Redirects to the next unanswered question or a thank-you page when finished.
+    """
     try:
         question = Question.objects.get(slug=slug)
         task = Task.objects.get(pk=question.task.pk)
@@ -199,7 +221,13 @@ def question_detail(request, slug):
 
 
 class ThankYouPageView(View):
+    """
+    Displays a thank-you page after the user completes all questions in a task.
+    """
     def get(self, request, alias):
+        """
+        Handles GET request to show the thank-you page and suggest the next task.
+        """
         task = Task.objects.get(alias=alias)
         next_task = (
             Task.objects.filter(category=task.category, alias__gt=task.alias)
